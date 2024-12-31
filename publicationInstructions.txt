@@ -1,0 +1,19 @@
+# Required config files : 
+pyproject.toml
+
+# Generate the package : 
+python -m pip install --upgrade build
+python -m build
+python -m pip install --upgrade twine
+
+# Upload the package
+python -m twine upload dist/*
+
+# install and test 
+python -m venv test-env
+source test-env/bin/activate  # On Windows: test-env\Scripts\activate
+pip install your-package-name
+
+# Updates
+Increment the version in pyproject.toml
+rebuild, and upload the new version to PyPI following the same steps.

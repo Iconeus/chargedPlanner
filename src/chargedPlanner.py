@@ -497,6 +497,8 @@ class DevGroup(object) :
 			with open(user_config_path, 'r') as f:
 				devDict = json.load(f)
 		else:
+			print("Please add your own dev.json in : ~/.config/chargedPlanner/devs.json")
+			print("local devs.json will be used in the meanwhile : " + current_dir + "/devs.json")
 			with open(current_dir + '/devs.json', 'r') as f:
 				devDict = json.load(f)
 

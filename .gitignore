@@ -1,3 +1,4 @@
 **/**.pyc
 dist/*
 src/chargedPlanner.egg-info/**
+test-env/*

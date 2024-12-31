@@ -4,10 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chargedPlanner"
-version = "0.1.0"
+version = "0.1.1"
 description = "A tool allowing to planify the work of developers"
 authors = [
     { name="Daniele TRIMARCHI", email="daniele.trimarchi@iconeus.com" }
+]
+dependencies = [
+    "plotly==5.24.1",
+    "numpy==2.0.2"
 ]
 license = { file="LICENSE.txt" }
 readme = "README.md"

@@ -11,7 +11,8 @@ authors = [
 ]
 dependencies = [
     "plotly==5.24.1",
-    "numpy==2.2.0"
+    "numpy==2.2.0",
+    "colorama"
 ]
 license = { file="LICENSE.txt" }
 readme = "README.md"

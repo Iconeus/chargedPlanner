@@ -10,10 +10,21 @@ Team Assignment: Allocate tasks to specific developers or teams.
 
 Gantt Chart Generation: Visualize project schedules through interactive Gantt charts.
 
+Once a project is defined, it is possible to visualise it as Gantt chart with different levels of granularity (Project, Version). See below the Gantt chart for a specific version of the project : 
+
+![Diagram](docs/images/VersionGantt.png "Version Gantt chart")
+
+At the developer level, the associated workload can be visualised under the form of a Gannt diagram, or a loadchart. Peaks overcoming 100% effort are highlighted in red :
+
+![Diagram](docs/images/DevGantt.png "dev Gantt chart")
+
+![Diagram](docs/images/DevCharge.png "dev charge diagram")
+
+
+
 ## Installation
 
 Ensure you have Python 3.6 or higher installed. Then, install the required dependencies:
-
 ```
   pip install -r requirements.txt
 ```
@@ -43,7 +54,17 @@ Fill all the devs of your group and place the file in the project resource folde
 C:\Users\<currentUser>\.config\chargedPlanner\devs.json
 ```
 
+## Load a test project :
+
+```
+from chargedPlanner import * 
+project= Project.unserialise()
+project.gantt()
+```
+
 See the auto tests for code usage 
+
+
 
 ## Dependencies
 

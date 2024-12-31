@@ -252,7 +252,7 @@ def test_project() :
 
 def test_serialise_project() :
 
-	from src.chargedPlanner import DevGroup, Feature, IcoStudioVersion, IcoLabVersion, Project, IconeusProduct
+	from src.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
 
 	charles = DevGroup()['Charles']
 	selene = DevGroup()['Selene']
@@ -312,3 +312,14 @@ def test_serialise_project() :
 	# a dev, the first project was de-referenced : thus there are no more
 	# features attached to devs in the icoStudioProject
 	assert( icoStudioProject == icoStudioProject_Reloaded )
+
+def test_unSerialise_project() :
+
+	from src.chargedPlanner import DevGroup, Project
+
+	project = Project.unserialise()
+	project.gantt()
+
+	charles = DevGroup()['Charles']
+	charles.gantt()
+

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chargedPlanner"
+version = "0.1.0"
+description = "A tool allowing to planify the work of developers"
+authors = [
+    { name="Daniele TRIMARCHI", email="daniele.trimarchi@iconeus.com" }
+]
+license = { file="LICENSE.txt" }
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]

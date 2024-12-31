@@ -12,13 +12,13 @@ Gantt Chart Generation: Visualize project schedules through interactive Gantt ch
 
 Once a project is defined, it is possible to visualise it as Gantt chart with different levels of granularity (Project, Version). See below the Gantt chart for a specific version of the project : 
 
-![Diagram](docs/images/VersionGantt.png "Version Gantt chart")
+![image](docs/images/VersionGantt.png)
 
 At the developer level, the associated workload can be visualised under the form of a Gannt diagram, or a loadchart. Peaks overcoming 100% effort are highlighted in red :
 
-![Diagram](docs/images/DevGantt.png "dev Gantt chart")
+![image](docs/images/DevGantt.png)
 
-![Diagram](docs/images/DevCharge.png "dev charge diagram")
+![image](docs/images/DevCharge.png)
 
 
 

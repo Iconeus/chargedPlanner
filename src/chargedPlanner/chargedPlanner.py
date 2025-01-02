@@ -505,7 +505,7 @@ class DevGroup(object) :
 			init(autoreset=True)
 			print(Fore.RED + "Please add your own dev.json in : ~/.config/chargedPlanner/devs.json")
 			print("local devs.json will be used in the meanwhile : " + current_dir + "/devs.json")
-			with open(current_dir + '/devs.json', 'r') as f:
+			with open(current_dir + '/data/devs.json', 'r') as f:
 				devDict = json.load(f)
 
 		self.__devs__ = []

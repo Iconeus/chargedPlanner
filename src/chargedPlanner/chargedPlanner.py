@@ -684,12 +684,18 @@ class Version(object) :
 
 		tasks = []
 		for i in self.__features__ :
-			tasks.append(dict(Task = i.__name__, Start= i.__startDate__.__str__(), Finish= i.getEndDate().__str__() ))
+			tasks.append(dict(
+				Task = i.__name__ + ":" + i.__assignee__.__name__,
+				Start= i.__startDate__.__str__(),
+				Finish= i.getEndDate().__str__()))
 
 		if not len(tasks) :
 			return
 
-		fig = ff.create_gantt(tasks,group_tasks=True, title= "Gantt chart for "+ self.__product__.name.__str__() + " version : " + self.__tag__ )
+		fig = ff.create_gantt(tasks,
+							  group_tasks=True,
+							  index_col='Task',
+							  title= "Gantt chart for "+ self.__product__.name.__str__() + " version : " + self.__tag__ )
 
 		fig.update_layout(
 			plot_bgcolor="peachpuff",  # Set the background color of the plot area

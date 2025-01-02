@@ -4,3 +4,4 @@ src/chargedPlanner.egg-info/**
 test-env/*
 .idea/*
 */chargedPlanner/dist/**
+chargedPlanner.egg-info/*

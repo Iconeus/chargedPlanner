@@ -685,9 +685,10 @@ class Version(object) :
 		tasks = []
 		for i in self.__features__ :
 			tasks.append(dict(
-				Task = i.__name__ + ":" + i.__assignee__.__name__,
+				Task = i.__name__,
 				Start= i.__startDate__.__str__(),
-				Finish= i.getEndDate().__str__()))
+				Finish= i.getEndDate().__str__(),
+				Assignee= i.__assignee__.__name__))
 
 		if not len(tasks) :
 			return
@@ -703,6 +704,10 @@ class Version(object) :
 			title_font=dict(size=18, color="black"),  # Customize title appearance
 			font=dict(size=12, color="black"),  # Customize font for the entire chart
 		)
+
+		for index, value in enumerate(fig.data[:len(tasks)]) :
+			value.update(text="Assignee: " + tasks[index]['Assignee'],
+					 	hoverinfo='text')
 
 		fig.show()
 

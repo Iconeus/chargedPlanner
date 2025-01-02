@@ -54,12 +54,56 @@ Fill all the devs of your group and place the file in the project resource folde
 C:\Users\<currentUser>\.config\chargedPlanner\devs.json
 ```
 
-## Load a test project :
+## Getting started :
 
 ```
 from chargedPlanner import * 
-project= Project.unserialise()
-project.gantt()
+
+charles = DevGroup()["Charles"]
+selene = DevGroup()["Selene"]
+
+connFeat = Feature(featName="Connectivity",
+                   remainingEffort=5,
+                   assignee=charles,
+                   percentageLoad = 20,
+                   startDate=datetime(2024, 12, 26).date())
+
+seedMapFeat = Feature(featName="SeedMap",
+                      remainingEffort=15,                      assignee=selene,
+                      percentageLoad=20,                      startDate=datetime(2024, 11, 15).date())
+
+scanV2Feat = Feature(featName="ScanV2",
+                    remainingEffort=15,
+                     assignee=charles,
+                     percentageLoad=40,
+                     startDate=datetime(2025, 1, 8).date())
+
+version1 = IcoStudioVersion("1.0.0")
+version1.addFeat(connFeat)
+version1.addFeat(seedMapFeat)
+
+with pytest.raises(ValueError):
+    charles.addWorkLoad(seedMapFeat,50)
+
+version2 = IcoStudioVersion("1.1.0")
+version2.addFeat(scanV2Feat)
+
+icoStudioProject = Project(IconeusProduct.IcoStudio)
+icoStudioProject.addVersion(version1)
+icoStudioProject.addVersion(version2)
+
+print(icoStudioProject)
+icoStudioProject.gantt()
+
+version1.gantt()
+
+charles.gantt()
+charles.loadChart()
+
+selene.gantt()
+selene.loadChart()
+
+icoStudioProject.serialise()
 ```
 
 See the auto tests for code usage 

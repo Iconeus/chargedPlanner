@@ -7,6 +7,10 @@ from enum import Enum
 from typing import List, Dict
 import json
 
+from pyexpat import features
+
+from numpy.f2py.auxfuncs import throw_error
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
@@ -223,7 +227,7 @@ class DevGroup(object) :
 
 				del self.__chargedWorkItems__[feature]
 
-			def getWorkloadFor(self, day: date) -> int:
+			def getWorkloadFor(self, day: date) -> float:
 
 				if not isinstance(day, date):
 					raise ValueError("day is not a date!")
@@ -641,10 +645,16 @@ class Version(object) :
 		self.__features__ = []
 		self.__product__ = product
 
+	def getTag(self) -> str :
+		return self.__tag__
+
 	def addFeat(self, feat : Feature) -> None :
 		self.__features__.append(feat)
 
 	def getStartDate(self) -> date:
+
+		if not len(features) :
+			raise ValueError('No features assigned to this version : the start date cannot be computed')
 
 		startDate = self.__features__[0].__startDate__
 		for i in self.__features__ :
@@ -661,6 +671,12 @@ class Version(object) :
 			if(tmp > endDate) :
 				endDate = tmp
 		return endDate
+
+	def getFeature(self, featureLabel : str) -> Feature :
+		ret = next((f for f in self.__features__ if f.__name__ == featureLabel), None)
+		if ret is None:
+			raise ValueError("Feature " + featureLabel + " not found in Version " + self.getTag())
+		return ret
 
 	def gantt(self) -> None :
 
@@ -695,11 +711,13 @@ class Version(object) :
 			"Features" :  [feature.to_dict() for feature in self.__features__]
 		}
 
+	def __features_from_dict__(self,data):
+		self.__features__ = [Feature.from_dict(feature) for feature in data]
+
 	@classmethod
 	def from_dict(cls, data):
-
 		ret = cls( IconeusProduct(data['Product']), data['VersionTag'] )
-		ret.__features__ = [Feature.from_dict(feature) for feature in data['Features']]
+		ret.features_from_dict(data['Features'])
 		return ret
 
 	def __eq__(self, other):
@@ -718,7 +736,7 @@ class Version(object) :
 
 	def __str__(self) -> None :
 
-		str = "Version " + self.__tag__ + "\n"
+		str = "Version : " + self.__tag__ + " for product : " + self.__product__.__str__() + "\n"
 		for i in self.__features__:
 			str += "\t" + i.__str__()
 		return str
@@ -728,12 +746,29 @@ class IcoStudioVersion(Version) :
 	def __init__(self,versionTag : str) :
 		super().__init__(IconeusProduct.IcoStudio, versionTag)
 
+	@classmethod
+	def from_dict(cls, data):
+		ret = cls(data["VersionTag"])
+		ret.__features_from_dict__(data['Features'])
+		return ret
+
 class IcoLabVersion(Version) :
 
 	def __init__(self,versionTag : str) :
 		super().__init__(IconeusProduct.IcoLab, versionTag)
 
+	@classmethod
+	def from_dict(cls, data):
+		ret = cls(data["VersionTag"])
+		ret.__features_from_dict__(data['Features'])
+		return ret
+
 class Project(object) :
+
+	version_classes = {
+		IconeusProduct.IcoStudio: IcoStudioVersion,
+		IconeusProduct.IcoLab: IcoLabVersion,
+	}
 
 	def __init__(self, iconeusProduct : Enum) :
 		self.__versions__ = []
@@ -746,6 +781,14 @@ class Project(object) :
 									"only for the same product!"
 			raise ValueError(str)
 		self.__versions__.append(version)
+
+	def getVersion(self, versionTag : str):
+
+		ret = next((v for v in self.__versions__ if v.getTag() == versionTag), None)
+		if ret is None:
+			raise ValueError("versionTag not found ! ")
+
+		return ret
 
 	def getStartDate(self) :
 
@@ -803,9 +846,18 @@ class Project(object) :
 
 		projectFile_version=data['ProjectFileVersion']
 
-		ret = cls( IconeusProduct(data['Product']) )
-		ret.__versions__ =  [Version.from_dict(version) for version in data['Versions']]
-		return ret
+		product_type = IconeusProduct(data["Product"])
+
+		version_class = cls.version_classes.get(product_type, Version)
+
+		project_instance = cls(IconeusProduct(data["Product"]))
+
+		project_instance.__versions__ = [
+			version_class.from_dict(version_data)
+			for version_data in data.get("Versions", [])
+		]
+
+		return project_instance
 
 	def serialise(self) -> None:
 		with open("Project.json", "w") as json_file:

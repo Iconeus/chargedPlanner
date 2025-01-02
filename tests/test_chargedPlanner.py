@@ -331,11 +331,31 @@ def test_unSerialise_project() :
 
 	test_setup()
 
-	from src.chargedPlanner import DevGroup, Project
+	from src.chargedPlanner import DevGroup, Project, IconeusProduct, IcoStudioVersion
 
 	project = Project.unserialise()
+
+	assert  IconeusProduct.IcoStudio == project.__product__
+
 	project.gantt()
 
 	charles = DevGroup()['Charles']
-	charles.gantt()
 
+	assert 0.2 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
+	assert 0.6 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
+
+	version = project.getVersion("1.0.0")
+
+	assert isinstance(version, IcoStudioVersion)
+
+	assert datetime(2024, 11, 15).date() == version.getStartDate(), "Version Start date mismatch"
+	assert datetime(2025, 3, 3).date() == version.getEndDate(), "Version End date mismatch"
+
+	with pytest.raises(ValueError):
+		version.getFeature("nonExistingFeature")
+
+	connFeat = version.getFeature("Connectivity")
+
+	assert datetime(2025, 1, 30).date() == connFeat.getEndDate()
+
+	charles.gantt()

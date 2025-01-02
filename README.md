@@ -56,7 +56,7 @@ C:\Users\<currentUser>\.config\chargedPlanner\devs.json
 
 ## Getting started :
 
-```
+```python
 from chargedPlanner import * 
 
 charles = DevGroup()["Charles"]
@@ -81,9 +81,6 @@ scanV2Feat = Feature(featName="ScanV2",
 version1 = IcoStudioVersion("1.0.0")
 version1.addFeat(connFeat)
 version1.addFeat(seedMapFeat)
-
-with pytest.raises(ValueError):
-    charles.addWorkLoad(seedMapFeat,50)
 
 version2 = IcoStudioVersion("1.1.0")
 version2.addFeat(scanV2Feat)

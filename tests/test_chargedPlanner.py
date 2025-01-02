@@ -3,6 +3,10 @@ from time import sleep
 import pytest
 from datetime import datetime
 
+def test_setup():
+	from src.chargedPlanner import DevGroup
+	DevGroup.reset_instance()  # Clear all instances
+
 def test_calendar_instance():
 
 	from src.chargedPlanner import Calendar
@@ -71,6 +75,8 @@ def test_dev() :
 
 def test_feat() :
 
+	test_setup()
+
 	from src.chargedPlanner import DevGroup,Feature
 
 	remainingEffort= 5
@@ -116,6 +122,8 @@ def test_feat() :
 
 def test_dev_gantt() :
 
+	test_setup()
+
 	from src.chargedPlanner import DevGroup, Feature
 
 	dev = DevGroup()["Charles"]
@@ -146,6 +154,8 @@ def test_dev_gantt() :
 	dev.loadChart()
 
 def test_version() :
+
+	test_setup()
 
 	from src.chargedPlanner import DevGroup, Feature, IcoStudioVersion
 
@@ -188,6 +198,8 @@ def test_version() :
 	assert(version.getEndDate() == datetime(2025, 2, 12).date())
 
 def test_project() :
+
+	test_setup()
 
 	from src.chargedPlanner import DevGroup, Feature, IcoStudioVersion, IcoLabVersion, Project, IconeusProduct
 
@@ -252,6 +264,8 @@ def test_project() :
 
 def test_serialise_project() :
 
+	test_setup()
+
 	from src.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
 
 	charles = DevGroup()['Charles']
@@ -314,6 +328,8 @@ def test_serialise_project() :
 	assert( icoStudioProject == icoStudioProject_Reloaded )
 
 def test_unSerialise_project() :
+
+	test_setup()
 
 	from src.chargedPlanner import DevGroup, Project
 

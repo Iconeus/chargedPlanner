@@ -65,14 +65,9 @@ project.gantt()
 See the auto tests for code usage 
 
 
-
 ## Dependencies
 
-Python 3.6+
-plotly
-
-Copy code
-pip install pandas matplotlib plotly
+See file : requirements.txt
 
 ## Contributing
 

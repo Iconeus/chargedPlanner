@@ -583,8 +583,8 @@ class Feature(object) :
 				   startDate = datetime.strptime(data['StartDate'], "%Y-%m-%d").date() )
 
 		#Add the workload to this assignee
+		assignee.addWorkLoad(tmp, purcLoad)
 		tmp.__assignee__ = assignee
-		tmp.__assignee__.addWorkLoad(tmp, purcLoad)
 
 		return tmp
 

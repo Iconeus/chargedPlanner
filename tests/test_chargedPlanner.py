@@ -120,6 +120,8 @@ def test_feat() :
 		requiredWorkDays=requireChargedDays)
 	assert( connFeat.getEndDate() == endDate  )
 
+	assert dev.getEndDateForLatestAssignedFeat() == datetime(2025, 3, 6).date()
+
 def test_dev_gantt() :
 
 	test_setup()

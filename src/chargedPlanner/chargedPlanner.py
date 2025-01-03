@@ -185,7 +185,6 @@ class DevGroup(object):
 			Returns a nested dictionary in the shape : {date : {feat , %} }
 			For each workDay in the required range, a list with features, workload assigned to this dev  
 			"""
-
             def getCalendarWorkload(
                 self, begin: date, end: date
             ) -> Dict[date, Dict[Feature, int]]:
@@ -301,6 +300,19 @@ class DevGroup(object):
                 return self.__calendar__.getDate_after_workDays(
                     startDate=startDate, requiredWorkDays=requireChargedDays
                 )
+
+            def getEndDateForLatestAssignedFeat(self) -> date :
+
+                if not len(self.__chargedWorkItems__):
+                    raise ValueError("No feature assigned to this dev, cannot infer the end date!")
+
+                endDate = list(self.__chargedWorkItems__)[0].getEndDate()
+                for iFeat in self.__chargedWorkItems__ :
+                    tmp = iFeat.getEndDate()
+                    if tmp>endDate :
+                       endDate = tmp
+
+                return endDate
 
             def getTimeFrame(self):
 
@@ -427,6 +439,11 @@ class DevGroup(object):
 
         def getEndDateForFeat(self, feature: Feature) -> date:
             return self.getWorkload().getEndDateForFeat(feature)
+
+        """ returns the latest end date amongs all the features assigned  """
+
+        def getEndDateForLatestAssignedFeat(self) -> date :
+            return self.getWorkload().getEndDateForLatestAssignedFeat()
 
         """ What are the dates of the first and the last features scheduled for this dev ?"""
 

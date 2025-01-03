@@ -69,14 +69,16 @@ connFeat = Feature(featName="Connectivity",
                    startDate=datetime(2024, 12, 26).date())
 
 seedMapFeat = Feature(featName="SeedMap",
-                      remainingEffort=15,                      assignee=selene,
-                      percentageLoad=20,                      startDate=datetime(2024, 11, 15).date())
+                      remainingEffort=15,
+                      assignee=selene,
+                      percentageLoad=20,
+                      startDate=datetime(2024, 11, 15).date())
 
 scanV2Feat = Feature(featName="ScanV2",
                     remainingEffort=15,
                      assignee=charles,
                      percentageLoad=40,
-                     startDate=datetime(2025, 1, 8).date())
+                     startDate=charles.getEndDateForLatestAssignedFeat())
 
 version1 = IcoStudioVersion("1.0.0")
 version1.addFeat(connFeat)

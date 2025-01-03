@@ -44,7 +44,12 @@ Create a json file named tasks.csv with the following structure:
 {
     "devs": [
         {
-            "name": "TheDevName"
+            "devType": "Manager",
+            "name": "<managerName>"
+        },
+        {
+            "devType": "Dev",
+            "name": "<devName>"
         },
 }
 ```

@@ -173,8 +173,8 @@ class DevGroup(object):
 
         class WorkLoad(object):
 
-            def __init__(self):
-                # Dictionary storing feature ids, and % load
+            def __init__(self) :
+                # Dictionary storing feature ids, and % load as float (range : 0-1)
                 self.__chargedWorkItems__ = {}
                 self.__calendar__ = Calendar()
 
@@ -272,7 +272,7 @@ class DevGroup(object):
                 for iDay in calendarWorkLoad.keys():
                     purc = self.getWorkloadFor(iDay)
                     if purc > 1:
-                        print("Workload for day " + iDay.__str__() + " = " + str(purc))
+                        print("Workload " + iDay.__str__() + " = " + str(purc))
 
             def getEndDateForFeat(self, feature: Feature) -> date:
 
@@ -374,7 +374,11 @@ class DevGroup(object):
                 str += "--------------------------------------\n"
                 return str
 
-        def __init__(self, devName):
+        def __init__(self, devName : str ) :
+
+            if not isinstance(devName, str):
+                raise ValueError("devName must be a str!!")
+
             self.__name__ = devName
             self.__workload__ = self.WorkLoad()
 
@@ -440,6 +444,7 @@ class DevGroup(object):
                         Task="Holiday",
                         Start=i.__str__(),
                         Finish=(i + timedelta(days=1)).__str__(),
+                        Purcentage=str(100)+"%"
                     )
                 )
 
@@ -452,6 +457,7 @@ class DevGroup(object):
                         Task="Weekends",
                         Start=i.__str__(),
                         Finish=(i + timedelta(days=1)).__str__(),
+                        Purcentage=str(100) + "%"
                     )
                 )
 
@@ -461,6 +467,7 @@ class DevGroup(object):
                         Task=i.__name__,
                         Start=i.__startDate__.__str__(),
                         Finish=i.getEndDate().__str__(),
+                        Purcentage=str(i.getPurcentageLoad()*100) + "%",
                     )
                 )
 
@@ -472,6 +479,16 @@ class DevGroup(object):
                 group_tasks=True,
                 title="Gantt chart for Developer : " + self.__name__,
             )
+
+            for index, value in enumerate(fig.data[: len(tasks)]):
+                taskName = value['name']
+                if taskName == "" :
+                    continue
+                correspondingTaskIndex = next((i for i, task in enumerate(tasks) if task['Task'] == taskName), -1)
+                if correspondingTaskIndex == -1:
+                    raise ValueError("Index not found !")
+                value.update(text= tasks[correspondingTaskIndex]["Task"] + ": " + tasks[correspondingTaskIndex]["Purcentage"], hoverinfo="text")
+
             fig.show()
 
         def loadChart(self) -> None:
@@ -493,17 +510,23 @@ class DevGroup(object):
 
             x_values = []
             y_values = []
+            custom_hover_text = []
 
             for iDay in calendarWorkLoad.keys():
                 x_values.append(iDay)
                 purc = 0
-                for iPurc in calendarWorkLoad[iDay].values():
-                    purc += iPurc
-                y_values.append(purc)
+                hoverText = str(iDay) + ":"
+
+                for index, (key, value) in enumerate(calendarWorkLoad[iDay].items()):
+                    purc += value
+                    hoverText += key.get_identifier() + ","
+
+                y_values.append(purc*100)
+                custom_hover_text.append(hoverText)
 
             import plotly.graph_objects as go
 
-            colors = ["red" if y > 1 else "blue" for y in y_values]
+            colors = ["red" if y > 100 else "blue" for y in y_values]
 
             fig = go.Figure()
 
@@ -517,6 +540,9 @@ class DevGroup(object):
                         size=12,
                         color=colors,  # Assign the conditional colors
                     ),
+                    hovertext=custom_hover_text,  # Custom hover text
+                    hoverinfo='text',  # Use only the text for hover
+
                 )
             )
 
@@ -652,6 +678,10 @@ class Feature(object):
 
         return self.__assignee__.getEndDateForFeat(self)
 
+    # Returns the purcentageload. This is a float in the range 0-1
+    def getPurcentageLoad(self) -> float :
+        return self.__assignee__.getWorkload().__chargedWorkItems__[self]
+
     def to_dict(self) -> dict:
 
         return {
@@ -659,9 +689,7 @@ class Feature(object):
             "StartDate": str(self.__startDate__),
             "RemainingEffort": str(self.__remainingEffort__),
             "Assignee": self.__assignee__.to_dict(),
-            "PercentageLoad": self.__assignee__.getWorkload().__chargedWorkItems__[
-                self
-            ],
+            "PercentageLoad": self.getPurcentageLoad(),
         }
 
     @classmethod
@@ -823,8 +851,13 @@ class Version(object):
             font=dict(size=12, color="black"),  # Customize font for the entire chart
         )
 
+        # loop on the figure data to override the hoverInfo. Each task reports its assignee
         for index, value in enumerate(fig.data[: len(tasks)]):
-            value.update(text="Assignee: " + tasks[index]["Assignee"], hoverinfo="text")
+            taskName= value['name']
+            correspondingTaskIndex = next((i for i, task in enumerate(tasks) if task['Task'] == taskName), -1)
+            if correspondingTaskIndex == -1 :
+                raise ValueError("Index not found !")
+            value.update(text="Assignee: " + tasks[correspondingTaskIndex]["Assignee"], hoverinfo="text")
 
         fig.show()
 

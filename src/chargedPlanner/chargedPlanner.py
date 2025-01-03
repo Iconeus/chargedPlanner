@@ -13,6 +13,8 @@ from pyexpat import features
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
+def defaultFilter(feat):
+    return True
 
 class Calendar(object):
 
@@ -95,6 +97,7 @@ class Calendar(object):
 
         return end_date
 
+    """ returns a list with the workdays in a given timeframe. Do not include holidays nor weekends"""
     def listWorkDays(self, start_date: date, end_date: date) -> list:
 
         if not isinstance(start_date, date):
@@ -171,12 +174,31 @@ class DevGroup(object):
 
     class Dev(object):
 
+        class ChargedWorkItemDict(dict) :
+
+            def __setitem__(self, key, value):
+                if not isinstance(key, Feature):
+                    raise TypeError("Keys must be Features")
+                if not isinstance(value, numbers.Number):
+                    raise TypeError("values must be numbers")
+                super().__setitem__(key, value)
+
+            ''' Get the first element of the dictionary, that respects the condition indicated by the filter '''
+            def getFirst(self, filter):
+                for feat in self :
+                    if filter(feat) :
+                        return feat
+                raise ValueError("item not found!")
+
         class WorkLoad(object):
 
             def __init__(self) :
                 # Dictionary storing feature ids, and % load as float (range : 0-1)
-                self.__chargedWorkItems__ = {}
+                self.__chargedWorkItems__ = DevGroup.Dev.ChargedWorkItemDict()
                 self.__calendar__ = Calendar()
+
+            def hasFeatureAssigned(self) -> bool :
+                return len( self.__chargedWorkItems__ ) != 0
 
             def getCalendar(self) -> Calendar:
                 return self.__calendar__
@@ -201,12 +223,17 @@ class DevGroup(object):
                 calendarWorkLoad = {}
                 for iDay in workdays:
                     for feat, purcentage in self.__chargedWorkItems__.items():
-                        if iDay > feat.__startDate__ and iDay < feat.getEndDate():
+                        if iDay > feat.getStartDate() and iDay < feat.getEndDate():
                             if iDay not in calendarWorkLoad:
                                 calendarWorkLoad[iDay] = {}
                             calendarWorkLoad[iDay][feat] = purcentage
 
                 return calendarWorkLoad
+
+            """ returns a list with the workdays in a given timeframe. Do not include holidays or weekends """
+            def listWorkDays(self, start_date: date, end_date: date) -> list :
+
+                return self.__calendar__.listWorkDays(start_date, end_date)
 
             """percentageLoad is expressed as an int in the range 0-100, but then stored as 0-1"""
             def setWorkLoad(
@@ -237,7 +264,7 @@ class DevGroup(object):
 
                 self.__chargedWorkItems__[feature] = percentageLoad / 100
 
-                self.checkWorkload(feature.__startDate__, feature.getEndDate())
+                self.checkWorkload(feature.getStartDate(), feature.getEndDate())
 
             def removeWorkLoad(self, feature: Feature) -> None:
 
@@ -301,16 +328,33 @@ class DevGroup(object):
                     startDate=startDate, requiredWorkDays=requireChargedDays
                 )
 
-            def getEndDateForLatestAssignedFeat(self) -> date :
+            def getStartDateForFirstAssignedFeat(self, filter = defaultFilter) -> date :
+
+                if not len(self.__chargedWorkItems__):
+                    raise ValueError("No feature assigned to this dev, cannot infer the start date!")
+
+                startDate = self.__chargedWorkItems__.getFirst(filter).getStartDate()
+
+                for iFeat in self.__chargedWorkItems__:
+                    if(filter(iFeat)) :
+                        tmp = iFeat.getStartDate()
+                        if tmp < startDate:
+                            startDate = tmp
+
+                return startDate
+
+            def getEndDateForLatestAssignedFeat(self, filter = defaultFilter ) -> date :
 
                 if not len(self.__chargedWorkItems__):
                     raise ValueError("No feature assigned to this dev, cannot infer the end date!")
 
-                endDate = list(self.__chargedWorkItems__)[0].getEndDate()
-                for iFeat in self.__chargedWorkItems__ :
-                    tmp = iFeat.getEndDate()
-                    if tmp>endDate :
-                       endDate = tmp
+                endDate = self.__chargedWorkItems__.getFirst(filter).getEndDate()
+
+                for iFeat in self.__chargedWorkItems__:
+                    if(filter(iFeat)) :
+                        tmp = iFeat.getEndDate()
+                        if tmp > endDate:
+                            endDate = tmp
 
                 return endDate
 
@@ -394,6 +438,9 @@ class DevGroup(object):
             self.__name__ = devName
             self.__workload__ = self.WorkLoad()
 
+            # A dev is supposedly loaded at 20% because of various meetings
+            PersistentFeature("Dev Meetings", self, 20)
+
         def getCalendar(self) -> Calendar:
             return self.getWorkload().getCalendar()
 
@@ -434,6 +481,11 @@ class DevGroup(object):
 
         def getWorkloadFor(self, day: date) -> float:
             return self.getWorkload().getWorkloadFor(day)
+
+        """ returns the first start date amongs all the features assigned  """
+
+        def getStartDateForFirstAssignedFeat(self) -> date :
+            return self.getWorkload().getStartDateForFirstAssignedFeat()
 
         """ returns the date of end for a specific feature assigned to this dev"""
 
@@ -482,7 +534,7 @@ class DevGroup(object):
                 tasks.append(
                     dict(
                         Task=i.__name__,
-                        Start=i.__startDate__.__str__(),
+                        Start=i.getStartDate().__str__(),
                         Finish=i.getEndDate().__str__(),
                         Purcentage=str(i.getPurcentageLoad()*100) + "%",
                     )
@@ -770,6 +822,45 @@ class Feature(object):
             + self.__remainingEffort__.__str__()
         )
         return str
+
+class PersistentFeature(Feature) :
+
+        def __init__(
+            self,
+            featName: str,
+            assignee: DevGroup.Dev,
+            percentageLoad: numbers.Number = 0
+            ):
+
+            super().__init__(featName=featName,
+                             remainingEffort = 1,
+                             assignee=assignee,
+                             percentageLoad=percentageLoad,
+                             startDate=datetime.today().date())
+
+        def getStartDate(self) :
+
+            def filter(feat):
+                return not isinstance(feat, PersistentFeature)
+
+            try:
+                startDate = self.__assignee__.getWorkload().getStartDateForFirstAssignedFeat(filter)
+            except ValueError as e:
+                startDate = datetime.today().date()
+
+            return startDate
+
+        def getEndDate(self) :
+
+            def filter(feat):
+                return not isinstance(feat, PersistentFeature)
+
+            try:
+                endDate = self.__assignee__.getWorkload().getEndDateForLatestAssignedFeat(filter)
+            except ValueError as e:
+                endDate = datetime.today().date()
+
+            return endDate
 
 
 # Version is not tied to any Project, and this is not possible

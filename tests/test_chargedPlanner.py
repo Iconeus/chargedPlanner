@@ -108,7 +108,7 @@ def test_feat() :
 
 	print(dev.getWorkload())
 
-	assert(dev.getWorkloadFor(datetime(2024, 12, 30).date()) == 0.5)
+	assert(dev.getWorkloadFor(datetime(2024, 12, 30).date()) == 0.7)
 
 	print("connectivity end : ", connFeat.getEndDate())
 
@@ -343,8 +343,8 @@ def test_unSerialise_project() :
 
 	charles = DevGroup()['Charles']
 
-	assert 0.2 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
-	assert 0.6 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
+	assert 0.4 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
+	assert 0.8 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
 
 	version = project.getVersion("1.0.0")
 

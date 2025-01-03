@@ -20,6 +20,7 @@
                         },
                         "Workload": {
                             "ChargedWorkItems": {
+                                "Dev Meetings": 0.2,
                                 "Connectivity": 0.2,
                                 "ScanV2": 0.4
                             },
@@ -47,6 +48,7 @@
                         },
                         "Workload": {
                             "ChargedWorkItems": {
+                                "Dev Meetings": 0.2,
                                 "SeedMap": 0.2
                             },
                             "Calendar": {
@@ -79,6 +81,7 @@
                         },
                         "Workload": {
                             "ChargedWorkItems": {
+                                "Dev Meetings": 0.2,
                                 "Connectivity": 0.2,
                                 "ScanV2": 0.4
                             },

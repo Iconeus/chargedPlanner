@@ -172,7 +172,7 @@ from decorators import singleton
 @singleton
 class DevGroup(object):
 
-    class Dev(object):
+    class DevBase(object):
 
         class ChargedWorkItemDict(dict) :
 
@@ -194,7 +194,7 @@ class DevGroup(object):
 
             def __init__(self) :
                 # Dictionary storing feature ids, and % load as float (range : 0-1)
-                self.__chargedWorkItems__ = DevGroup.Dev.ChargedWorkItemDict()
+                self.__chargedWorkItems__ = DevGroup.DevBase.ChargedWorkItemDict()
                 self.__calendar__ = Calendar()
 
             def hasFeatureAssigned(self) -> bool :
@@ -398,7 +398,7 @@ class DevGroup(object):
 
             def __eq__(self, other):
 
-                if isinstance(other, DevGroup.Dev.WorkLoad):
+                if isinstance(other, DevGroup.DevBase.WorkLoad):
                     return self.__calendar__ == other.__calendar__
                 """
 				Cannot compare the __chargedWorkItems__. This would break the project save and
@@ -437,9 +437,6 @@ class DevGroup(object):
 
             self.__name__ = devName
             self.__workload__ = self.WorkLoad()
-
-            # A dev is supposedly loaded at 20% because of various meetings
-            PersistentFeature("Dev Meetings", self, 20)
 
         def getCalendar(self) -> Calendar:
             return self.getWorkload().getCalendar()
@@ -632,6 +629,7 @@ class DevGroup(object):
 
             return {
                 "DevName": self.__name__,
+                "DevType": self.__class__.__name__,
                 "Calendar": self.getCalendar().to_dict(),
                 "Workload": self.__workload__.to_dict(),
             }
@@ -648,7 +646,7 @@ class DevGroup(object):
 
         def __eq__(self, other):
 
-            if isinstance(other, DevGroup.Dev):
+            if isinstance(other, DevGroup.DevBase):
                 return (
                     self.__name__ == other.__name__
                     and self.__workload__ == other.__workload__
@@ -665,6 +663,25 @@ class DevGroup(object):
                 + self.__workload__.__str__()
             )
             return str
+
+    class Dev(DevBase) :
+
+        def __init__(self, devName : str ) :
+
+            super().__init__(devName)
+
+            # A dev is supposedly loaded at 20% because of various meetings
+            PersistentFeature("Dev Meetings", self, 20)
+
+    class Manager(DevBase) :
+
+        def __init__(self, devName : str ) :
+
+            super().__init__(devName)
+
+            # A manager is supposedly loaded at 40% because of various meetings
+            PersistentFeature("Dev Meetings", self, 20)
+            PersistentFeature("Management", self, 20)
 
     def __init__(self):
 
@@ -690,9 +707,17 @@ class DevGroup(object):
 
         self.__devs__ = []
         for i in devDict["devs"]:
-            self.__devs__.append(DevGroup.Dev(i["name"]))
 
-    def __getitem__(self, key) -> Dev:
+            if i["devType"]==DevGroup.Dev.__name__ :
+                self.__devs__.append(DevGroup.Dev(i["name"]))
+
+            elif i["devType"] == DevGroup.Manager.__name__ :
+                self.__devs__.append(DevGroup.Manager(i["name"]))
+
+            else :
+                raise ValueError("Dev type "+ i["devType"] + " not recognised !")
+
+    def __getitem__(self, key) -> DevBase:
 
         dev = next((d for d in self.__devs__ if d.__name__ == key), None)
         if not dev:
@@ -707,7 +732,7 @@ class Feature(object):
         self,
         featName: str,
         remainingEffort: int,
-        assignee: DevGroup.Dev = None,
+        assignee: DevGroup.DevBase = None,
         percentageLoad: numbers.Number = 0,
         startDate: date = datetime.today().date(),
     ):
@@ -726,7 +751,7 @@ class Feature(object):
 
         if assignee is not None:
 
-            if not isinstance(assignee, DevGroup.Dev):
+            if not isinstance(assignee, DevGroup.DevBase):
                 raise ValueError("assignee is not a Dev!")
             if not isinstance(percentageLoad, numbers.Number):
                 raise ValueError("effort is not a Number!")
@@ -766,7 +791,7 @@ class Feature(object):
 
         devs = DevGroup()
 
-        assignee = DevGroup.Dev.from_dict(data["Assignee"])
+        assignee = DevGroup.DevBase.from_dict(data["Assignee"])
 
         assignee = devs[assignee.__name__]
 
@@ -828,7 +853,7 @@ class PersistentFeature(Feature) :
         def __init__(
             self,
             featName: str,
-            assignee: DevGroup.Dev,
+            assignee: DevGroup.DevBase,
             percentageLoad: numbers.Number = 0
             ):
 

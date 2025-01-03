@@ -343,6 +343,9 @@ def test_unSerialise_project() :
 
 	charles = DevGroup()['Charles']
 
+	assert isinstance(charles, DevGroup.Dev)
+	assert not isinstance(charles, DevGroup.Manager)
+
 	assert 0.4 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
 	assert 0.8 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
 

@@ -140,6 +140,12 @@ def test_dev_gantt() :
 					   	percentageLoad=80,
 				 		startDate=datetime(2024,12,26).date())
 
+	refactor = Feature(featName="Refactor",
+				   			remainingEffort=10,
+				   			assignee=dev,
+						  	percentageLoad=20,
+							startDate = dev.getEndDateForLatestAssignedFeat())
+
 	seedMapFeat = Feature(featName="SeedMap",
 				   			remainingEffort=10,
 				   			assignee=dev,

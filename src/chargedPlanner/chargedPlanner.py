@@ -223,7 +223,7 @@ class DevGroup(object):
                 calendarWorkLoad = {}
                 for iDay in workdays:
                     for feat, purcentage in self.__chargedWorkItems__.items():
-                        if iDay > feat.getStartDate() and iDay < feat.getEndDate():
+                        if iDay >= feat.getStartDate() and iDay <= feat.getEndDate():
                             if iDay not in calendarWorkLoad:
                                 calendarWorkLoad[iDay] = {}
                             calendarWorkLoad[iDay][feat] = purcentage

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chargedPlanner"
-version = "0.1.5"
+version = "0.1.6"
 description = "A tool allowing to planify the work of developers"
 authors = [
     { name="Daniele TRIMARCHI", email="daniele.trimarchi@iconeus.com" }

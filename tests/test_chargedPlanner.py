@@ -205,6 +205,10 @@ def test_version() :
 
 	assert(version.getEndDate() == datetime(2025, 2, 12).date())
 
+	from src.chargedPlanner.chargedPlanner import IcoScanVersion, IcoLabVersion
+	version = IcoLabVersion("1.0.0")
+	version = IcoScanVersion("1.0.0")
+
 def test_project() :
 
 	test_setup()

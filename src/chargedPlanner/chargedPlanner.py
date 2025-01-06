@@ -899,6 +899,7 @@ class PersistentFeature(Feature) :
 class IconeusProduct(Enum):
     IcoStudio = "IcoStudio"
     IcoLab = "IcoLab"
+    IcoScan = "IcoScan"
 
 
 class Version(object):
@@ -1068,11 +1069,24 @@ class IcoLabVersion(Version):
         return ret
 
 
+class IcoScanVersion(Version):
+
+    def __init__(self, versionTag: str):
+        super().__init__(IconeusProduct.IcoScan, versionTag)
+
+    @classmethod
+    def from_dict(cls, data):
+        ret = cls(data["VersionTag"])
+        ret.__features_from_dict__(data["Features"])
+        return ret
+
+
 class Project(object):
 
     version_classes = {
         IconeusProduct.IcoStudio: IcoStudioVersion,
         IconeusProduct.IcoLab: IcoLabVersion,
+        IconeusProduct.IcoScan: IcoScanVersion,
     }
 
     def __init__(self, iconeusProduct: Enum):

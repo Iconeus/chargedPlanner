@@ -2,7 +2,8 @@
     "devs": [
         {
             "devType": "Manager",
-            "name": "Daniele"
+            "name": "Daniele",
+            "luccaID" : 33
         },
         {
             "devType": "Dev",
@@ -14,7 +15,8 @@
         },
         {
             "devType": "Dev",
-            "name": "Thibaud"
+            "name": "Thibaud",
+            "luccaID" : 16
         }
     ]
 }

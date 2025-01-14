@@ -168,6 +168,7 @@ class Calendar(object):
 
 from decorators import singleton
 
+from LuccaAPI import LuccaAPI
 
 @singleton
 class DevGroup(object):
@@ -499,6 +500,15 @@ class DevGroup(object):
         def getTimeFrame(self):
             return self.getWorkload().getTimeFrame()
 
+        def luccaConnector(self, luccaID : int) -> None :
+
+            startDate = datetime.today().date()
+            endDate = startDate + timedelta(days=365)
+
+            from LuccaAPI import LuccaAPI
+            for i in LuccaAPI().getLeaves(luccaID,startDate,endDate) :
+                self.add_holiday(i["date"],i["date"])
+
         def gantt(self) -> None:
 
             import plotly.figure_factory as ff
@@ -718,14 +728,24 @@ class DevGroup(object):
         self.__devs__ = []
         for i in devDict["devs"]:
 
+            dev= None
+
+            # Create the dev
             if i["devType"]==DevGroup.Dev.__name__ :
-                self.__devs__.append(DevGroup.Dev(i["name"]))
+                dev = DevGroup.Dev(i["name"])
 
             elif i["devType"] == DevGroup.Manager.__name__ :
-                self.__devs__.append(DevGroup.Manager(i["name"]))
+                dev = DevGroup.Manager(i["name"])
 
             else :
                 raise ValueError("Dev type "+ i["devType"] + " not recognised !")
+
+            # Ties to Lucca
+            if "luccaID" in i :
+                dev.luccaConnector( i["luccaID"] )
+
+            self.__devs__.append(dev)
+
 
     def __getitem__(self, key) -> DevBase:
 

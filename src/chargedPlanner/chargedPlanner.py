@@ -13,6 +13,9 @@ from pyexpat import features
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
+def is_running_under_pytest():
+    return "PYTEST_CURRENT_TEST" in os.environ
+
 def defaultFilter(feat):
     return True
 
@@ -319,7 +322,7 @@ class DevGroup(object):
                 # otherwise, the work is ongoing. Only matters today and the remaining effort
                 if (
                     feature.__startDate__ > datetime.now().date()
-                    or "PYTEST_CURRENT_TEST" in os.environ
+                    or is_running_under_pytest()
                 ):
                     startDate = feature.__startDate__
                 else:
@@ -741,6 +744,7 @@ class DevGroup(object):
                 raise ValueError("Dev type "+ i["devType"] + " not recognised !")
 
             # Ties to Lucca
+#            if not  is_running_under_pytest() :
             if "luccaID" in i :
                 dev.luccaConnector( i["luccaID"] )
 

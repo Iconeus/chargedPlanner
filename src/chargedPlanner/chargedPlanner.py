@@ -555,6 +555,11 @@ class DevGroup(object):
                     raise ValueError("Index not found !")
                 value.update(text= tasks[correspondingTaskIndex]["Task"] + ": " + tasks[correspondingTaskIndex]["Purcentage"], hoverinfo="text")
 
+            current_date = datetime.today().strftime("%Y-%m-%d")
+
+            # Add a vertical line for the current date (Use add_vline for Plotly v5+)
+            fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
+
             fig.show()
 
         def loadChart(self) -> None:
@@ -621,6 +626,11 @@ class DevGroup(object):
                 xaxis_title="Date",
                 yaxis_title="Workload %",
             )
+
+            current_date = datetime.today().strftime("%Y-%m-%d")
+
+            # Add a vertical line for the current date (Use add_vline for Plotly v5+)
+            fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
 
             # Show the plot
             fig.show()
@@ -993,6 +1003,11 @@ class Version(object):
                 raise ValueError("Index not found !")
             value.update(text="Assignee: " + tasks[correspondingTaskIndex]["Assignee"], hoverinfo="text")
 
+        current_date = datetime.today().strftime("%Y-%m-%d")
+
+        # Add a vertical line for the current date (Use add_vline for Plotly v5+)
+        fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
+
         fig.show()
 
     def __dereference__(self):
@@ -1166,6 +1181,11 @@ class Project(object):
             title_font=dict(size=18, color="black"),  # Customize title appearance
             font=dict(size=12, color="black"),  # Customize font for the entire chart
         )
+
+        current_date = datetime.today().strftime("%Y-%m-%d")
+
+        # Add a vertical line for the current date (Use add_vline for Plotly v5+)
+        fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
 
         fig.show()
 

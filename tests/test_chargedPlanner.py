@@ -122,6 +122,17 @@ def test_feat() :
 
 	assert dev.getEndDateForLatestAssignedFeat() == datetime(2025, 3, 6).date()
 
+def test_dev() :
+
+	test_setup()
+
+	from src.chargedPlanner.chargedPlanner import DevGroup, Feature
+
+	dev = DevGroup()["Daniele"]
+	assert dev.__name__ == "Daniele"
+
+	dev.gantt()
+
 def test_dev_gantt() :
 
 	test_setup()

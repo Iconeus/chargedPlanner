@@ -39,6 +39,7 @@ class LuccaAPI(object) :
         # Make the GET request
         import requests
 
+        print("url= ", url)
         response = requests.get(LuccaAPI.baseUrl + url, headers=self.__headers__)
 
         # Check the response

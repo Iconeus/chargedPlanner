@@ -506,7 +506,7 @@ class DevGroup(object):
         def luccaConnector(self, luccaID : int) -> None :
 
             startDate = datetime.today().date()
-            endDate = startDate + timedelta(days=365)
+            endDate = startDate + timedelta(days=120)
 
             from LuccaAPI import LuccaAPI
             for i in LuccaAPI().getLeaves(luccaID,startDate,endDate) :
@@ -706,56 +706,64 @@ class DevGroup(object):
             PersistentFeature("Dev Meetings", self, 20)
             PersistentFeature("Management", self, 20)
 
+    def __createDev__(self, jsonEntry : dict):
+
+        dev = None
+
+        # Create the dev
+        if jsonEntry["devType"] == DevGroup.Dev.__name__:
+            dev = DevGroup.Dev(jsonEntry["name"])
+
+        elif jsonEntry["devType"] == DevGroup.Manager.__name__:
+            dev = DevGroup.Manager(jsonEntry["name"])
+
+        else:
+            raise ValueError("Dev type " + jsonEntry["devType"] + " not recognised !")
+
+        # Ties to Lucca
+        #            if not  is_running_under_pytest() :
+        if "luccaID" in jsonEntry:
+            dev.luccaConnector(jsonEntry["luccaID"])
+
+        self.__devs__.append(dev)
+
+
     def __init__(self):
 
-        user_config_path = os.path.expanduser("~/.config/chargedPlanner/devs.json")
-        if os.path.exists(user_config_path):
-            with open(user_config_path, "r") as f:
-                devDict = json.load(f)
-        else:
-            from colorama import init, Fore
-
-            init(autoreset=True)
-            print(
-                Fore.RED
-                + "Please add your own dev.json in : ~/.config/chargedPlanner/devs.json"
-            )
-            print(
-                "local devs.json will be used in the meanwhile : "
-                + current_dir
-                + "/devs.json"
-            )
-            with open(current_dir + "/data/devs.json", "r") as f:
-                devDict = json.load(f)
-
         self.__devs__ = []
-        for i in devDict["devs"]:
 
-            dev= None
-
-            # Create the dev
-            if i["devType"]==DevGroup.Dev.__name__ :
-                dev = DevGroup.Dev(i["name"])
-
-            elif i["devType"] == DevGroup.Manager.__name__ :
-                dev = DevGroup.Manager(i["name"])
-
-            else :
-                raise ValueError("Dev type "+ i["devType"] + " not recognised !")
-
-            # Ties to Lucca
-#            if not  is_running_under_pytest() :
-            if "luccaID" in i :
-                dev.luccaConnector( i["luccaID"] )
-
-            self.__devs__.append(dev)
-
-
+    # Lazy evaluation to instanciate a dev with its info
     def __getitem__(self, key) -> DevBase:
 
         dev = next((d for d in self.__devs__ if d.__name__ == key), None)
+
         if not dev:
-            raise ValueError("Dev " + key + " not found!")
+
+            user_config_path = os.path.expanduser("~/.config/chargedPlanner/devs.json")
+            if os.path.exists(user_config_path):
+                with open(user_config_path, "r") as f:
+                    devDict = json.load(f)
+            else:
+                from colorama import init, Fore
+
+                init(autoreset=True)
+                print(
+                    Fore.RED
+                    + "Please add your own dev.json in : ~/.config/chargedPlanner/devs.json"
+                )
+                print(
+                    "local devs.json will be used in the meanwhile : "
+                    + current_dir
+                    + "/devs.json"
+                )
+                with open(current_dir + "/data/devs.json", "r") as f:
+                    devDict = json.load(f)
+
+            for iEntry in devDict["devs"] :
+                if iEntry["name"] == key :
+                    self.__createDev__(iEntry)
+
+            dev = next((d for d in self.__devs__ if d.__name__ == key), None)
 
         return dev
 

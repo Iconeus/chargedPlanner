@@ -66,6 +66,12 @@ class LuccaAPI(object) :
         url = "?leavePeriod.ownerId=" + str(lucca_ID) + "&date=between," + str(start_date) + "," + str(end_date)
         ans = self.__post__(url)
 
+        if ans == None :
+            return []
+
+        if not len(ans["data"]):
+            return []
+
         if not len(ans["data"]["items"]) :
             return []
 

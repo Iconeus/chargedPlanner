@@ -721,9 +721,9 @@ class DevGroup(object):
             raise ValueError("Dev type " + jsonEntry["devType"] + " not recognised !")
 
         # Ties to Lucca
-        #            if not  is_running_under_pytest() :
-        if "luccaID" in jsonEntry:
-            dev.luccaConnector(jsonEntry["luccaID"])
+        if not  is_running_under_pytest() :
+            if "luccaID" in jsonEntry:
+                dev.luccaConnector(jsonEntry["luccaID"])
 
         self.__devs__.append(dev)
 

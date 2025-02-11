@@ -52,14 +52,14 @@ jobs:
       env:
         LUCCA_API_TOKEN: ${{ secrets.LUCCA_API_TOKEN }}
       run: |
-        cmdkey /generic:MyAPIToken /user:dummy /pass:$env:LUCCA_API_TOKEN
+        cmdkey /generic:MyLuccaToken /user:dummy /pass:$env:LUCCA_API_TOKEN
         echo "Token stored securely in Credential Manager."
 
     # Retrieve and use the token securely
     - name: Retrieve API Token
       shell: pwsh
       run: |
-        $retrievedToken = cmdkey /list | Select-String "MyAPIToken"
+        $retrievedToken = cmdkey /list | Select-String "MyLuccaToken"
         if ($retrievedToken) {
           echo "Token successfully retrieved."
         } else {

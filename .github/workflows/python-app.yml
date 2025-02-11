@@ -1,5 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow installs dependencies, runs tests, and securely stores an API token.
 
 name: Python application
 
@@ -24,7 +23,7 @@ jobs:
   
     - uses: actions/checkout@v2
 
-    - name: Set up Python  ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -44,22 +43,36 @@ jobs:
 
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
+    # Securely store API token in Windows Credential Manager
     - name: Store API Token in Windows Credential Manager
+      shell: pwsh
       env:
         LUCCA_API_TOKEN: ${{ secrets.LUCCA_API_TOKEN }}
       run: |
-        cmdkey /generic:MyAPIToken /user:dummy /pass:"$env:LUCCA_API_TOKEN"
+        cmdkey /generic:MyAPIToken /user:dummy /pass:$env:LUCCA_API_TOKEN
+        echo "Token stored securely in Credential Manager."
 
-    - name: Retrieve and Use Token
+    # Retrieve and use the token securely
+    - name: Retrieve API Token
+      shell: pwsh
       run: |
-        echo Retrieving API Token from Windows Credential Manager...
-        cmdkey /list | findstr "MyAPIToken"
+        $retrievedToken = cmdkey /list | Select-String "MyAPIToken"
+        if ($retrievedToken) {
+          echo "Token successfully retrieved."
+        } else {
+          echo "Token not found." && exit 1
+        }
 
+    # Run tests with pytest, assuming the Python script fetches the token securely
     - name: Test with pytest
       run: |
         pytest
+
+    # Cleanup: Remove the API token after workflow execution
+    - name: Remove API Token from Windows Credential Manager
+      shell: pwsh
+      run: |
+        cmdkey /delete:MyAPIToken

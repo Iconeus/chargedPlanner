@@ -9,24 +9,6 @@ on:
     branches: [ master ]
 
 jobs:
-  setup-credential-manager:
-    runs-on: windows-latest  # Run on a Windows runner
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Store API Token in Windows Credential Manager
-        env:
-          LUCCA_API_TOKEN: ${{ secrets.LUCCA_API_TOKEN }}
-        run: |
-          cmdkey /generic:MyAPIToken /user:dummy /pass:%LUCCA_API_TOKEN%
-
-      - name: Retrieve and Use Token
-        run: |
-          echo Retrieving API Token from Windows Credential Manager...
-          cmdkey /list | findstr "MyAPIToken"
-
   build:
     runs-on: windows-latest
 
@@ -39,11 +21,14 @@ jobs:
       pull-requests: write
 
     steps:
+
     - uses: actions/checkout@v2
+
     - name: Set up Python  ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Cache pip dependencies
       uses: actions/cache@v3
       with:
@@ -51,16 +36,30 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    - name: Store API Token in Windows Credential Manager
+      env:
+        LUCCA_API_TOKEN: ${{ secrets.LUCCA_API_TOKEN }}
+      run: |
+        cmdkey /generic:MyAPIToken /user:dummy /pass:%LUCCA_API_TOKEN%
+
+    - name: Retrieve and Use Token
+      run: |
+        echo Retrieving API Token from Windows Credential Manager...
+        cmdkey /list | findstr "MyAPIToken"
+
     - name: Test with pytest
       run: |
         pytest

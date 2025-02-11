@@ -65,8 +65,9 @@ Fill all the devs of your group and place the file in the project resource folde
 ```
 C:\Users\<currentUser>\.config\chargedPlanner\devs.json
 ```
-Note that the luccaID is optional, and only required if a link to Lucca is required to get the holidays of the dev team
-In this case, an api token is required to access the lucca REST API. The token must be saved to the windows credential manager. User must be defined as 'dummy' 
+Note that the luccaID is optional, and must only be filed if a link to Lucca is required. THe link to Lucca allows automatical retrieval of the holidays of the dev team.
+
+In this case, an api token is required to access the lucca REST API. The token must be saved to the windows credential manager. User must be defined as 'dummy' :
 
 ![image](https://github.com/Iconeus/chargedPlanner/blob/main/docs/images/credentialManager.png)
 

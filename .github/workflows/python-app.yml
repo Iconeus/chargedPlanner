@@ -75,4 +75,4 @@ jobs:
     - name: Remove API Token from Windows Credential Manager
       shell: pwsh
       run: |
-        cmdkey /delete:MyAPIToken
+        cmdkey /delete:MyLuccaToken

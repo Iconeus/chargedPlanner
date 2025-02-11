@@ -168,10 +168,7 @@ class Calendar(object):
             str += "\n\t" + i.__str__()
         return str
 
-
 from decorators import singleton
-
-from LuccaAPI import LuccaAPI
 
 @singleton
 class DevGroup(object):

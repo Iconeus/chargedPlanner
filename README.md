@@ -21,15 +21,20 @@ At the developer level, the associated workload can be visualised under the form
 ![image](https://github.com/Iconeus/chargedPlanner/blob/main/docs/images/DevCharge.PNG)
 
 
+## User Installation
 
-## Installation
+Users can install the latest version of the library direclty from pip via: 
+```
+  pip install chargedPlanner
+```
+
+## Dev Installation
 
 Ensure you have Python 3.6 or higher installed. Then, install the required dependencies:
 ```
   pip install -r requirements.txt
 ```
 
-## Usage
 Clone the Repository:
 
 ```
@@ -38,7 +43,7 @@ https://github.com/Iconeus/chargedPlanner
 
 ## Prepare Your Data:
 
-Create a json file named tasks.csv with the following structure:
+Create a json file named devs.json with the following structure:
 
 ```
 {
@@ -46,10 +51,12 @@ Create a json file named tasks.csv with the following structure:
         {
             "devType": "Manager",
             "name": "<managerName>"
+            "luccaID": <luccaID>
         },
         {
             "devType": "Dev",
             "name": "<devName>"
+            "luccaID": <luccaID>
         },
 }
 ```
@@ -58,6 +65,11 @@ Fill all the devs of your group and place the file in the project resource folde
 ```
 C:\Users\<currentUser>\.config\chargedPlanner\devs.json
 ```
+Note that the luccaID is optional, and only required if a link to Lucca is required to get the holidays of the dev team
+In this case, an api token is required to access the lucca REST API. The token must be saved to the windows credential manager. User must be defined as 'dummy' 
+
+![image](https://github.com/Iconeus/chargedPlanner/blob/main/docs/images/credentialManager.png)
+
 
 ## Getting started :
 

@@ -1,34 +1,35 @@
 from datetime import date
-import os
-import json
-
-from decorators import singleton
+from src.chargedPlanner.decorators import singleton
 
 @singleton
 class LuccaAPI(object) :
 
     baseUrl = "https://iconeus-rh.ilucca.net/api/v3/leaves"
 
+    # On windows, set your token on credential manager with :
+    # cmdkey /generic:MyLuccaToken /user:dummy /pass:<TOKEN>
+
     def __init__(self):
 
         self.__headers__ = {}
 
-        user_config_path = os.path.expanduser("~/.config/chargedPlanner/luccaToken.json")
+        try :
+            import keyring  
+            self.__headers__["Authorization"] = "lucca application=" + keyring.get_password("MyLuccaToken", "dummy")
 
-        if os.path.exists(user_config_path):
-            with open(user_config_path, "r") as f:
-                self.__headers__["Authorization"] = "lucca application=" + json.load(f)["token"]
-
-        else:
+        except Exception as e:
 
             from colorama import init, Fore
 
             init(autoreset=True)
             print(
                 Fore.RED
-                + "Please add your lucca token in : ~/.config/chargedPlanner/luccaToken.json"
-                + "\nUntil then, Lucca bindings are disabled"
+                + "Error retrieving token: {e}"
             )
+            import sys
+            sys.exit(1)
+
+    # =====================================================
 
     def __post__(self,url : str):
 

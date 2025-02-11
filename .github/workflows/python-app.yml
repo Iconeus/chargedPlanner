@@ -9,12 +9,31 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  setup-credential-manager:
+    runs-on: windows-latest  # Run on a Windows runner
 
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Store API Token in Windows Credential Manager
+        env:
+          LUCCA_API_TOKEN: ${{ secrets.LUCCA_API_TOKEN }}
+        run: |
+          cmdkey /generic:MyAPIToken /user:dummy /pass:%LUCCA_API_TOKEN%
+
+      - name: Retrieve and Use Token
+        run: |
+          echo Retrieving API Token from Windows Credential Manager...
+          cmdkey /list | findstr "MyAPIToken"
+
+  build:
     runs-on: windows-latest
+
     strategy:
       matrix:
         python-version: [3.10.0]
+
     permissions:
       contents: read
       pull-requests: write

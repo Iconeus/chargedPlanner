@@ -1,10 +1,14 @@
 from datetime import date
 from src.chargedPlanner.decorators import singleton
+from src.chargedPlanner.chargedPlanner import get_config_filePath
 
 @singleton
 class LuccaAPI(object) :
 
-    baseUrl = "https://iconeus-rh.ilucca.net/api/v3/leaves"
+    import json
+    with open(get_config_filePath(), "r") as f:
+        baseUrl = json.load(f)["luccaURL"]
+        f.close()
 
     # On windows, set your token on credential manager with :
     # cmdkey /generic:MyLuccaToken /user:dummy /pass:<TOKEN>
@@ -38,16 +42,15 @@ class LuccaAPI(object) :
             return {}
 
         # Make the GET request
-        import requests
-
         print("url= ", url)
+        import requests
         response = requests.get(LuccaAPI.baseUrl + url, headers=self.__headers__)
 
         # Check the response
         if response.status_code == 200:
             print("Success !")  # If the response is JSON, parse and print it
         else:
-            print(f"Error {response.status_code}: {response.text}")
+            raise Exception(f"Error {response.status_code}: {response.text}")
 
         return response.json()
 

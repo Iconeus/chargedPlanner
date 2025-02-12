@@ -1,4 +1,5 @@
 {
+    "luccaURL" : "https://iconeus-rh.ilucca.net/api/v3/leaves",
     "devs": [
         {
             "devType": "Manager",
@@ -17,6 +18,22 @@
             "devType": "Dev",
             "name": "Thibaud",
             "luccaID" : 16
+        },
+        {
+            "devType": "Manager",
+            "name": "Mohamed"
+        },
+        {
+            "devType": "Dev",
+            "name": "Luc"
+        },
+        {
+            "devType": "Dev",
+            "name": "Adrien"
+        },
+        {
+            "devType": "Dev",
+            "name": "Guillaume"
         }
     ]
 }

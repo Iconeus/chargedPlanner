@@ -7,6 +7,7 @@ import sys
 from enum import Enum
 from typing import Dict
 import json
+from pathlib import Path
 
 from pyexpat import features
 
@@ -18,6 +19,28 @@ def is_running_under_pytest():
 
 def defaultFilter(feat):
     return True
+
+def get_config_filePath() -> Path :
+
+    user_config_path = os.path.expanduser("~/.config/chargedPlanner/config.json")
+    if os.path.exists(user_config_path):
+        return Path(user_config_path)
+
+    else:
+        from colorama import init, Fore
+
+        init(autoreset=True)
+        print(
+            Fore.RED
+            + "Please add your own config.json in : ~/.config/chargedPlanner/config.json"
+        )
+        print(
+            "local config.json will be used in the meanwhile : "
+            + current_dir
+            + "/config.json"
+        )
+        return Path(current_dir + "/data/config.json")
+
 
 class Calendar(object):
 
@@ -736,31 +759,15 @@ class DevGroup(object):
 
         if not dev:
 
-            user_config_path = os.path.expanduser("~/.config/chargedPlanner/devs.json")
-            if os.path.exists(user_config_path):
-                with open(user_config_path, "r") as f:
-                    devDict = json.load(f)
-            else:
-                from colorama import init, Fore
+            with open(get_config_filePath(), "r") as f:
+                devDict = json.load(f)
+                f.close()
 
-                init(autoreset=True)
-                print(
-                    Fore.RED
-                    + "Please add your own dev.json in : ~/.config/chargedPlanner/devs.json"
-                )
-                print(
-                    "local devs.json will be used in the meanwhile : "
-                    + current_dir
-                    + "/devs.json"
-                )
-                with open(current_dir + "/data/devs.json", "r") as f:
-                    devDict = json.load(f)
+                for iEntry in devDict["devs"] :
+                    if iEntry["name"] == key :
+                        self.__createDev__(iEntry)
 
-            for iEntry in devDict["devs"] :
-                if iEntry["name"] == key :
-                    self.__createDev__(iEntry)
-
-            dev = next((d for d in self.__devs__ if d.__name__ == key), None)
+                dev = next((d for d in self.__devs__ if d.__name__ == key), None)
 
         return dev
 

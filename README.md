@@ -6,6 +6,8 @@ DevTeam Gantt Planner is a Python-based tool designed to assist development team
 
 Project Scheduling: Define features, define the required effort, assign them to developers within the DevTeam. Outline project timelines.
 
+Lucca Integration : the Lucca API can be leveraged to retrieve the holidays of the developers. Project planning will be modified accordingly 
+
 Team Assignment: Allocate tasks to specific developers or teams.
 
 Gantt Chart Generation: Visualize project schedules through interactive Gantt charts.

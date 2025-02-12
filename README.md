@@ -66,7 +66,7 @@ Create a json file named devs.json with the following structure:
 
 Fill all the devs of your group and place the file in the project resource folder : 
 ```
-C:\Users\<currentUser>\.config\chargedPlanner\devs.json
+C:\Users\<currentUser>\.config\chargedPlanner\config.json
 ```
 Note that the lucca URL and ID are optional, and must only be filed if a link to Lucca is required. The link to Lucca allows automatical retrieval of the holidays of the dev team.
 

@@ -41,6 +41,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Install the package
+      run: |
+        pip install -e .
+
     - name: Debug package installation
       run: |
         python -c "import chargedPlanner; print(chargedPlanner.__file__)"

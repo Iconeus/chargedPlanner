@@ -41,6 +41,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV
+
+    - name: Debug package installation
+        run: python -c "import chargedPlanner; print(chargedPlanner.__file__)"
+
     - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics

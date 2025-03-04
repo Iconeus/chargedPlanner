@@ -41,9 +41,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV
-
     - name: Debug package installation
         run: python -c "import chargedPlanner; print(chargedPlanner.__file__)"
 

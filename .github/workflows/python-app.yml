@@ -42,7 +42,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Debug package installation
-        run: python -c "import chargedPlanner; print(chargedPlanner.__file__)"
+      run: |
+        python -c "import chargedPlanner; print(chargedPlanner.__file__)"
 
     - name: Lint with flake8
       run: |

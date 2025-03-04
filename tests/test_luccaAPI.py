@@ -2,7 +2,7 @@ import pytest
 
 def test_lucca_api():
 
-    from src.chargedPlanner.LuccaAPI import LuccaAPI
+    from chargedPlanner.LuccaAPI import LuccaAPI
     from datetime import datetime
 
     l = LuccaAPI()

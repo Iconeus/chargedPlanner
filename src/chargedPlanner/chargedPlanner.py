@@ -573,11 +573,23 @@ class DevGroup(object):
             if not len(tasks):
                 return
 
-            fig = ff.create_gantt(
-                tasks,
-                group_tasks=True,
-                title="Gantt chart for Developer : " + self.__name__,
-            )
+            import pandas as pd
+            df = pd.DataFrame(tasks)
+
+            # Convert to DataFrame and Reset Index
+            df = pd.DataFrame(tasks)
+            df.reset_index(drop=True, inplace=True)
+
+            def random_warm_color():
+                """Generate a bright RGB color."""
+                import random
+                return f"rgb({random.randint(100, 255)}, {random.randint(100, 250)}, {random.randint(0, 255)})"
+
+            unique_tasks = df["Task"].unique()
+            color_dict = {task: random_warm_color() for task in unique_tasks}
+
+            fig = ff.create_gantt(df, colors=color_dict, index_col="Task", show_colorbar=False, group_tasks=True,
+                                   title="Task Schedule")
 
             for index, value in enumerate(fig.data[: len(tasks)]):
                 taskName = value['name']

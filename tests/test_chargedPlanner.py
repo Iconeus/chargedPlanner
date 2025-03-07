@@ -170,6 +170,108 @@ def test_dev_gantt() :
 	dev.gantt()
 	dev.loadChart()
 
+def test_figure() :
+
+	import plotly.figure_factory as ff
+	import pandas as pd
+
+	# Sample Data with More Than 10 Tasks
+	tasks = [
+		{"Task": f"Task {i}", "Start": f"2024-03-{i + 1}", "Finish": f"2024-03-{i + 3}"}
+		for i in range(1, 15)
+	]
+
+	# Convert to DataFrame and Reset Index
+	df = pd.DataFrame(tasks)
+	df.reset_index(drop=True, inplace=True)
+
+	# Create Gantt Chart
+	fig = ff.create_gantt(df, index_col="Task", show_colorbar=True, title="Project Timeline")
+	fig.show()
+
+
+# def test_dev_gantt_many() :
+#
+# 	test_setup()
+#
+# 	from src.chargedPlanner.chargedPlanner import DevGroup, Feature
+#
+# 	selene = DevGroup()["Selene"]
+#
+# 	NXTApiFeat = Feature(featName="task1",
+# 						remainingEffort=1,
+# 						assignee=selene,
+# 						percentageLoad=10,
+# 						startDate=datetime(2025, 3, 7).date())
+#
+# 	diagToolsInstallerFeat = Feature(featName="task2",
+# 						remainingEffort=1,
+# 						assignee=selene,
+# 						percentageLoad=10,
+# 						startDate=datetime(2025, 3, 7).date())
+#
+# 	testing222 = Feature(featName="task3",
+# 					 remainingEffort=1,
+# 					 assignee=selene,
+# 					 percentageLoad=10,
+# 					 startDate=datetime(2025, 3, 7).date())
+#
+# 	seedMapFeat = Feature(featName="task4",
+# 					  remainingEffort=1,
+# 					  assignee=selene,
+# 					  percentageLoad=10,
+# 					  startDate=datetime(2025, 3, 7).date())
+#
+# 	plotSigFeat = Feature(featName="task5",
+# 					  remainingEffort=1,
+# 					  assignee=selene,
+# 					  percentageLoad=10,
+# 					  startDate=datetime(2025, 3, 7).date())
+#
+# 	refactoring_sj = Feature(featName="task6",
+# 						 remainingEffort=1,  # WARNING : estimate provided in Wrike but not provied in Tuleap !!
+# 						 assignee=selene,
+# 						 percentageLoad=10,
+# 						 startDate=datetime(2025, 3, 7).date())
+#
+# 	rcbv = Feature(featName="task7",
+# 			   remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 			   assignee=selene,
+# 			   percentageLoad=10,
+# 			   startDate=datetime(2025, 3, 7).date())
+#
+# 	threedROIs = Feature(featName="task8",
+# 					 remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 					 assignee=selene,
+# 					 percentageLoad=10,
+# 					 startDate=datetime(2025, 3, 7).date())
+#
+# 	brainNav = Feature(featName="task9",
+# 				   remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 				   assignee=selene,
+# 				   percentageLoad=10,
+# 				   startDate=datetime(2025, 3, 7).date())
+#
+# 	ica = Feature(featName="task10",
+# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 			  assignee=selene,
+# 			  percentageLoad=10,
+# 			  startDate=datetime(2025, 3, 7).date())
+#
+# 	ica = Feature(featName="task11",
+# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 			  assignee=selene,
+# 			  percentageLoad=10,
+# 			  startDate=datetime(2025, 3, 7).date())
+#
+# 	ica = Feature(featName="task12",
+# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
+# 			  assignee=selene,
+# 			  percentageLoad=10,
+# 			  startDate=datetime(2025, 3, 7).date())
+#
+# 	selene.gantt()
+
 def test_version() :
 
 	test_setup()

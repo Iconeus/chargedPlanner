@@ -548,9 +548,11 @@ class DevGroup(object):
                 )
 
             timeRange = self.getTimeFrame()
-            for i in self.getCalendar().listWeekEnds(
+            weekends = self.getCalendar().listWeekEnds(
                 timeRange["startDate"], timeRange["endDate"]
-            ):
+            )
+
+            for i in weekends :
                 tasks.append(
                     dict(
                         Task="Weekends",
@@ -605,6 +607,13 @@ class DevGroup(object):
             # Add a vertical line for the current date (Use add_vline for Plotly v5+)
             fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
 
+            # Add a vertical line at the end of each weekend
+            for index, i in enumerate(weekends) :
+                if index % 2 == 0:  # Check if the index is even
+                    fig.add_vline(x=i, line=dict(color="grey", width=1, dash="dot"))
+                else:
+                    fig.add_vline(x=i + timedelta(days=1), line=dict(color="grey", width=1, dash="dot"))
+
             fig.show()
 
         def loadChart(self) -> None:
@@ -622,6 +631,11 @@ class DevGroup(object):
 
             calendarWorkLoad = self.getWorkload().getCalendarWorkload(
                 startDate, endDate
+            )
+
+            timeRange = self.getTimeFrame()
+            weekends = self.getCalendar().listWeekEnds(
+                timeRange["startDate"], timeRange["endDate"]
             )
 
             x_values = []
@@ -676,6 +690,12 @@ class DevGroup(object):
 
             # Add a vertical line for the current date (Use add_vline for Plotly v5+)
             fig.add_vline(x=current_date, line=dict(color="red", width=2, dash="dash"))
+
+            for index, i in enumerate(weekends) :
+                if index % 2 == 0:  # Check if the index is even
+                    fig.add_vline(x=i, line=dict(color="grey", width=1, dash="dot"))
+                else:
+                    fig.add_vline(x=i + timedelta(days=1), line=dict(color="grey", width=1, dash="dot"))
 
             # Show the plot
             fig.show()

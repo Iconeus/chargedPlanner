@@ -181,13 +181,14 @@ def test_figure() :
 		for i in range(1, 15)
 	]
 
-	# Convert to DataFrame and Reset Index
-	df = pd.DataFrame(tasks)
-	df.reset_index(drop=True, inplace=True)
+	from src.chargedPlanner.chargedPlanner import prepare_for_gantt
+	[df, color_dict] = prepare_for_gantt(tasks)
 
 	# Create Gantt Chart
-	fig = ff.create_gantt(df, index_col="Task", show_colorbar=True, title="Project Timeline")
+	fig = ff.create_gantt(df, colors=color_dict, index_col="Task", show_colorbar=False, group_tasks=True,
+						  title="Task Schedule")
 	fig.show()
+
 
 
 # def test_dev_gantt_many() :

@@ -181,17 +181,8 @@ def test_figure() :
 		for i in range(1, 15)
 	]
 
-	# Convert to DataFrame and Reset Index
-	df = pd.DataFrame(tasks)
-	df.reset_index(drop=True, inplace=True)
-
-	def random_warm_color():
-		"""Generate a bright RGB color."""
-		import random
-		return f"rgb({random.randint(100, 255)}, {random.randint(100, 250)}, {random.randint(0, 255)})"
-
-	unique_tasks = df["Task"].unique()
-	color_dict = {task: random_warm_color() for task in unique_tasks}
+	from src.chargedPlanner.chargedPlanner import prepare_for_gantt
+	[df, color_dict] = prepare_for_gantt(tasks)
 
 	# Create Gantt Chart
 	fig = ff.create_gantt(df,
@@ -201,6 +192,7 @@ def test_figure() :
 						  group_tasks=True,
 						  title="Project Timeline")
 	fig.show()
+
 
 
 # def test_dev_gantt_many() :

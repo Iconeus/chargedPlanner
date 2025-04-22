@@ -296,6 +296,75 @@ def test_testing_feat() :
 	version.gantt()
 
 
+def test_documentation_feat() :
+
+	test_setup()
+
+	from src.chargedPlanner.chargedPlanner import (DevGroup, Feature,
+												   TestingFeature, DocumentationFeature,
+												   IcoStudioVersion)
+
+	version = IcoStudioVersion("1.0.0")
+
+	selene = DevGroup()["Selene"]
+	charles = DevGroup()["Charles"]
+	daniele = DevGroup()["Daniele"]
+
+	connFeat = Feature(featName="Connectivity",
+				   		remainingEffort=5,
+						assignee=charles,
+					    percentageLoad = 20,
+						startDate=datetime(2024, 12, 26).date())
+
+	seedMapFeat = Feature(featName="SeedMap",
+						  assignee=selene,
+						  remainingEffort=10,
+						  percentageLoad=40,
+						  startDate = datetime(2024, 12, 26).date())
+
+	scanv2Feat = Feature(featName="ScanV2",
+						 assignee=charles,
+						 remainingEffort=4,
+						 percentageLoad=30,
+						 startDate = datetime(2025, 2, 2).date())
+
+	version.addFeat(connFeat)
+	version.addFeat(seedMapFeat)
+	version.addFeat(scanv2Feat)
+
+	testing = TestingFeature(
+		version=version,
+		assignee=selene,
+		purcentage=5,
+		timespan=timedelta(days=15)
+	)
+
+	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
+
+	version.addFeat(testing)
+
+	assert( testing.getEndDate() == version.getEndDate() )
+
+	documentation = DocumentationFeature(
+		version=version,
+		assignee=daniele,
+		purcentage=5,
+		timespan=timedelta(days=15)
+	)
+
+	assert (documentation.getStartDate() == datetime(2025, 3, 5).date())
+	assert (documentation.getEndDate() == datetime(2025, 3, 19).date())
+
+	version.addFeat(documentation)
+
+	assert (documentation.getEndDate() == version.getEndDate())
+	assert (testing.getEndDate() != version.getEndDate())
+
+	print(version)
+
+	version.gantt()
+
 def test_project() :
 
 	test_setup()

@@ -1030,7 +1030,9 @@ class TestingFeature(FixedTimeSpanTrailingFeature) :
 
         remainingEffort = 0
         for i in version.__features__ :
-            remainingEffort += purcentage / 100 * i.__remainingEffort__
+            if not isinstance(i,FixedTimeSpanTrailingFeature) :
+                remainingEffort += purcentage / 100 * i.__remainingEffort__
+
         # round the value to the highest integer [days]
         remainingEffort = math.ceil(remainingEffort)
 
@@ -1042,6 +1044,41 @@ class TestingFeature(FixedTimeSpanTrailingFeature) :
                         remainingEffort = remainingEffort,
                         version = version,
                         assignee = assignee)
+
+class DocumentationFeature(FixedTimeSpanTrailingFeature) :
+
+    def __init__(
+        self,
+        timespan : timedelta,
+        version : Version = None,
+        assignee : DevGroup.DevBase = None,
+        purcentage : int = 5,
+    ) :
+
+        if not isinstance(version, Version):
+            raise ValueError("version is not a Version!")
+        if not isinstance(assignee, DevGroup.DevBase):
+            raise ValueError("assignee is not a Dev!")
+        if not isinstance(purcentage, int):
+            raise ValueError("purcentage is not an int!")
+
+        remainingEffort = 0
+        for i in version.__features__ :
+            if not isinstance(i,FixedTimeSpanTrailingFeature) :
+                remainingEffort += purcentage / 100 * i.__remainingEffort__
+
+        # round the value to the highest integer [days]
+        remainingEffort = math.ceil(remainingEffort)
+
+        featName= version.name() + "_documentation"
+
+        super().__init__(
+                        featName=featName,
+                        timespan= timespan,
+                        remainingEffort = remainingEffort,
+                        version = version,
+                        assignee = assignee)
+
 
 # but : I need to access my version (product milestone) to manipulate the
 # features directly. I must probably interhcange product and version.

@@ -1,8 +1,6 @@
 import pytest
 from datetime import datetime, timedelta
 
-from src.chargedPlanner.chargedPlanner import FixedTimeSpanTrailingFeature
-
 
 def test_setup():
 	from src.chargedPlanner.chargedPlanner import DevGroup

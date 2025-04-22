@@ -1,6 +1,6 @@
 from datetime import date
-from chargedPlanner.decorators import singleton
-from chargedPlanner.chargedPlanner import get_config_filePath
+from src.chargedPlanner.decorators import singleton
+from src.chargedPlanner.chargedPlanner import get_config_filePath
 
 @singleton
 class LuccaAPI(object) :

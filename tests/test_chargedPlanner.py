@@ -1,5 +1,8 @@
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from src.chargedPlanner.chargedPlanner import FixedTimeSpanTrailingFeature
+
 
 def test_setup():
 	from src.chargedPlanner.chargedPlanner import DevGroup
@@ -193,90 +196,6 @@ def test_figure() :
 						  title="Project Timeline")
 	fig.show()
 
-
-
-# def test_dev_gantt_many() :
-#
-# 	test_setup()
-#
-# 	from src.chargedPlanner.chargedPlanner import DevGroup, Feature
-#
-# 	selene = DevGroup()["Selene"]
-#
-# 	NXTApiFeat = Feature(featName="task1",
-# 						remainingEffort=1,
-# 						assignee=selene,
-# 						percentageLoad=10,
-# 						startDate=datetime(2025, 3, 7).date())
-#
-# 	diagToolsInstallerFeat = Feature(featName="task2",
-# 						remainingEffort=1,
-# 						assignee=selene,
-# 						percentageLoad=10,
-# 						startDate=datetime(2025, 3, 7).date())
-#
-# 	testing222 = Feature(featName="task3",
-# 					 remainingEffort=1,
-# 					 assignee=selene,
-# 					 percentageLoad=10,
-# 					 startDate=datetime(2025, 3, 7).date())
-#
-# 	seedMapFeat = Feature(featName="task4",
-# 					  remainingEffort=1,
-# 					  assignee=selene,
-# 					  percentageLoad=10,
-# 					  startDate=datetime(2025, 3, 7).date())
-#
-# 	plotSigFeat = Feature(featName="task5",
-# 					  remainingEffort=1,
-# 					  assignee=selene,
-# 					  percentageLoad=10,
-# 					  startDate=datetime(2025, 3, 7).date())
-#
-# 	refactoring_sj = Feature(featName="task6",
-# 						 remainingEffort=1,  # WARNING : estimate provided in Wrike but not provied in Tuleap !!
-# 						 assignee=selene,
-# 						 percentageLoad=10,
-# 						 startDate=datetime(2025, 3, 7).date())
-#
-# 	rcbv = Feature(featName="task7",
-# 			   remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 			   assignee=selene,
-# 			   percentageLoad=10,
-# 			   startDate=datetime(2025, 3, 7).date())
-#
-# 	threedROIs = Feature(featName="task8",
-# 					 remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 					 assignee=selene,
-# 					 percentageLoad=10,
-# 					 startDate=datetime(2025, 3, 7).date())
-#
-# 	brainNav = Feature(featName="task9",
-# 				   remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 				   assignee=selene,
-# 				   percentageLoad=10,
-# 				   startDate=datetime(2025, 3, 7).date())
-#
-# 	ica = Feature(featName="task10",
-# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 			  assignee=selene,
-# 			  percentageLoad=10,
-# 			  startDate=datetime(2025, 3, 7).date())
-#
-# 	ica = Feature(featName="task11",
-# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 			  assignee=selene,
-# 			  percentageLoad=10,
-# 			  startDate=datetime(2025, 3, 7).date())
-#
-# 	ica = Feature(featName="task12",
-# 			  remainingEffort=1,  # WARNING : estimate not provied in Tuleap !!
-# 			  assignee=selene,
-# 			  percentageLoad=10,
-# 			  startDate=datetime(2025, 3, 7).date())
-#
-# 	selene.gantt()
-
 def test_version() :
 
 	test_setup()
@@ -324,6 +243,127 @@ def test_version() :
 	from src.chargedPlanner.chargedPlanner import IcoScanVersion, IcoLabVersion
 	version = IcoLabVersion("1.0.0")
 	version = IcoScanVersion("1.0.0")
+
+def test_testing_feat() :
+
+	test_setup()
+
+	from src.chargedPlanner.chargedPlanner import DevGroup, Feature, TestingFeature, IcoStudioVersion
+
+	version = IcoStudioVersion("1.0.0")
+
+	selene = DevGroup()["Selene"]
+	charles = DevGroup()["Charles"]
+
+	connFeat = Feature(featName="Connectivity",
+				   		remainingEffort=5,
+						assignee=charles,
+					    percentageLoad = 20,
+						startDate=datetime(2024, 12, 26).date())
+
+	seedMapFeat = Feature(featName="SeedMap",
+						  assignee=selene,
+						  remainingEffort=10,
+						  percentageLoad=40,
+						  startDate = datetime(2024, 12, 26).date())
+
+	scanv2Feat = Feature(featName="ScanV2",
+						 assignee=charles,
+						 remainingEffort=4,
+						 percentageLoad=30,
+						 startDate = datetime(2025, 2, 2).date())
+
+	version.addFeat(connFeat)
+	version.addFeat(seedMapFeat)
+	version.addFeat(scanv2Feat)
+
+	testing = TestingFeature(
+		version=version,
+		assignee=selene,
+		purcentage=5,
+		timespan=timedelta(days=15)
+	)
+
+	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
+
+	version.addFeat(testing)
+
+	assert( testing.getEndDate() == version.getEndDate() )
+
+	print(version)
+
+	version.gantt()
+
+
+def test_documentation_feat() :
+
+	test_setup()
+
+	from src.chargedPlanner.chargedPlanner import (DevGroup, Feature,
+												   TestingFeature, DocumentationFeature,
+												   IcoStudioVersion)
+
+	version = IcoStudioVersion("1.0.0")
+
+	selene = DevGroup()["Selene"]
+	charles = DevGroup()["Charles"]
+	daniele = DevGroup()["Daniele"]
+
+	connFeat = Feature(featName="Connectivity",
+				   		remainingEffort=5,
+						assignee=charles,
+					    percentageLoad = 20,
+						startDate=datetime(2024, 12, 26).date())
+
+	seedMapFeat = Feature(featName="SeedMap",
+						  assignee=selene,
+						  remainingEffort=10,
+						  percentageLoad=40,
+						  startDate = datetime(2024, 12, 26).date())
+
+	scanv2Feat = Feature(featName="ScanV2",
+						 assignee=charles,
+						 remainingEffort=4,
+						 percentageLoad=30,
+						 startDate = datetime(2025, 2, 2).date())
+
+	version.addFeat(connFeat)
+	version.addFeat(seedMapFeat)
+	version.addFeat(scanv2Feat)
+
+	testing = TestingFeature(
+		version=version,
+		assignee=selene,
+		purcentage=5,
+		timespan=timedelta(days=15)
+	)
+
+	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
+
+	version.addFeat(testing)
+
+	assert( testing.getEndDate() == version.getEndDate() )
+
+	documentation = DocumentationFeature(
+		version=version,
+		assignee=daniele,
+		purcentage=5,
+		timespan=timedelta(days=15)
+	)
+
+	assert (documentation.getStartDate() == datetime(2025, 3, 5).date())
+	assert (documentation.getEndDate() == datetime(2025, 3, 19).date())
+
+	version.addFeat(documentation)
+
+	assert (documentation.getEndDate() == version.getEndDate())
+	assert (testing.getEndDate() != version.getEndDate())
+
+	print(version)
+
+	version.gantt()
 
 def test_project() :
 

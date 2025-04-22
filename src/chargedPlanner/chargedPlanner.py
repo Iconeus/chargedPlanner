@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 import numbers
+import math
 import os
 import sys
 from enum import Enum
@@ -489,7 +490,7 @@ class DevGroup(object):
         def add_holiday(self, start_date: date, end_date: date) -> None:
             self.getCalendar().add_holiday(start_date, end_date)
 
-        def get_workdays(self, start_date: date, end_date: date) -> int:
+        def count_workdays(self, start_date: date, end_date: date) -> int:
             return self.getCalendar().count_working_days(start_date, end_date)
 
         def addWorkLoad(self, feat: Feature, percentageLoad: int) -> None:
@@ -973,9 +974,111 @@ class PersistentFeature(Feature) :
 
             return endDate
 
+class FixedTimeSpanTrailingFeature(Feature) :
 
-# Version is not tied to any Project, and this is not possible
+    def __init__(
+        self,
+        featName: str,
+        timespan : timedelta,
+        remainingEffort : int,
+        version : Version = None,
+        assignee : DevGroup.DevBase = None,
+    ) :
+
+        if not isinstance(featName, str):
+            raise ValueError("featName"+ str(featName) +" is not a str!")
+        if not isinstance(version, Version):
+            raise ValueError("version is not a Version!")
+        if not isinstance(assignee, DevGroup.DevBase):
+            raise ValueError("assignee is not a Dev!")
+        if not isinstance(remainingEffort, int):
+            raise ValueError("purcentage is not an int!")
+
+        # this feautre starts at the end of the current version
+        startDate = version.getEndDate()
+
+        # How many workdays since the beginning of th
+        workDays = assignee.count_workdays(startDate, startDate+timespan)
+
+        percentageLoad = 100 * remainingEffort / workDays
+
+        super().__init__(featName=featName,
+                         remainingEffort = remainingEffort,
+                         assignee=assignee,
+                         percentageLoad=percentageLoad,
+                         startDate=startDate)
+
+        # Version is not tied to any Project, and this is not possible
 # this should probably be an inner class of Project
+
+class TestingFeature(FixedTimeSpanTrailingFeature) :
+
+    def __init__(
+        self,
+        timespan : timedelta,
+        version : Version = None,
+        assignee : DevGroup.DevBase = None,
+        purcentage : int = 5,
+    ) :
+
+        if not isinstance(version, Version):
+            raise ValueError("version is not a Version!")
+        if not isinstance(assignee, DevGroup.DevBase):
+            raise ValueError("assignee is not a Dev!")
+        if not isinstance(purcentage, int):
+            raise ValueError("purcentage is not an int!")
+
+        remainingEffort = 0
+        for i in version.__features__ :
+            if not isinstance(i,FixedTimeSpanTrailingFeature) :
+                remainingEffort += purcentage / 100 * i.__remainingEffort__
+
+        # round the value to the highest integer [days]
+        remainingEffort = math.ceil(remainingEffort)
+
+        featName= version.name() + "_testing"
+
+        super().__init__(
+                        featName=featName,
+                        timespan= timespan,
+                        remainingEffort = remainingEffort,
+                        version = version,
+                        assignee = assignee)
+
+class DocumentationFeature(FixedTimeSpanTrailingFeature) :
+
+    def __init__(
+        self,
+        timespan : timedelta,
+        version : Version = None,
+        assignee : DevGroup.DevBase = None,
+        purcentage : int = 5,
+    ) :
+
+        if not isinstance(version, Version):
+            raise ValueError("version is not a Version!")
+        if not isinstance(assignee, DevGroup.DevBase):
+            raise ValueError("assignee is not a Dev!")
+        if not isinstance(purcentage, int):
+            raise ValueError("purcentage is not an int!")
+
+        remainingEffort = 0
+        for i in version.__features__ :
+            if not isinstance(i,FixedTimeSpanTrailingFeature) :
+                remainingEffort += purcentage / 100 * i.__remainingEffort__
+
+        # round the value to the highest integer [days]
+        remainingEffort = math.ceil(remainingEffort)
+
+        featName= version.name() + "_documentation"
+
+        super().__init__(
+                        featName=featName,
+                        timespan= timespan,
+                        remainingEffort = remainingEffort,
+                        version = version,
+                        assignee = assignee)
+
 
 # but : I need to access my version (product milestone) to manipulate the
 # features directly. I must probably interhcange product and version.
@@ -1002,7 +1105,10 @@ class Version(object):
     def getTag(self) -> str:
         return self.__tag__
 
-    def addFeat(self, feat: Feature) -> None:
+    def name(self) -> str :
+        return str(self.__product__.value + " " + self.getTag())
+
+    def addFeat(self, feat: Feature) -> None :
         self.__features__.append(feat)
 
     def getStartDate(self) -> date:

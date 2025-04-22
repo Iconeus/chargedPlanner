@@ -69,10 +69,18 @@ class Calendar(object):
 
     def __init__(self):
 
+        # initial definition; leave this unchanged for passing tests
         self.__holidays__ = [
             datetime(2024, 12, 25).date(),  # Christmas
             datetime(2024, 12, 26).date(),  # Day after Christmas
         ]
+
+        # add the public holidays for the year to come
+        import holidays
+        current_year = datetime.now().year
+        next_year = current_year + 1
+        fr_holidays = holidays.France(years=next_year)
+        self.__holidays__ += list(fr_holidays.keys())
 
         self.__weekends__ = {5, 6}  # Saturday and Sunday
 

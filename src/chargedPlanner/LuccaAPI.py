@@ -90,11 +90,21 @@ class LuccaAPI(object) :
             # print("\t", "endsAt : ", leave['data']['endsAt'])
             # print("\t", "leaveAccountDuration : ", leave['data']['leaveAccountDuration'])
 
+            # there is only a flag used to define remote working in the current Iconeus framework.
+            # Why did they not use the flag 'isremotework' ?
+            if leave['data']['leaveAccount']['name'] == 'Télétravail' :
+                continue
+
             from datetime import datetime
             data.append({"date": datetime.strptime(leave["data"]["date"], "%Y-%m-%dT%H:%M:%S"),
                          "time_period": "AM" if leave["data"]["isAM"] == True else "PM",
                          "duration": leave["data"]["leaveAccountDuration"]
                          })
+
+        # in  the case only remote working was defined in the given time span
+        # data will be empty
+        if not len(data) :
+            return []
 
         # Convert to DataFrame
         from pandas import DataFrame

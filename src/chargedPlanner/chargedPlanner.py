@@ -20,6 +20,7 @@ sys.path.append(current_dir)
 def is_running_under_pytest():
     return "PYTEST_CURRENT_TEST" in os.environ
 
+
 def defaultFilter(feat):
     return True
 

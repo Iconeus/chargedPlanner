@@ -601,7 +601,7 @@ class DevGroup(object):
             [df,color_dict] = prepare_for_gantt(tasks)
 
             fig = ff.create_gantt(df, colors=color_dict, index_col="Task", show_colorbar=False, group_tasks=True,
-                                   title="Task Schedule")
+                                   title="Gantt chart for Developer : " + self.__name__)
 
             for index, value in enumerate(fig.data[: len(tasks)]):
                 taskName = value['name']
@@ -623,6 +623,13 @@ class DevGroup(object):
                     fig.add_vline(x=i, line=dict(color="grey", width=1, dash="dot"))
                 else:
                     fig.add_vline(x=i + timedelta(days=1), line=dict(color="grey", width=1, dash="dot"))
+
+            fig.update_layout(
+                plot_bgcolor="lightgrey",  # Set the background color of the plot area
+                paper_bgcolor="white",  # Set the background color of the entire figure
+                title_font=dict(size=18, color="black", weight=10),  # Customize title appearance
+                font=dict(size=12, color="black"),  # Customize font for the entire chart
+            )
 
             fig.show()
 
@@ -1174,7 +1181,7 @@ class Version(object):
         fig.update_layout(
             plot_bgcolor="peachpuff",  # Set the background color of the plot area
             paper_bgcolor="white",  # Set the background color of the entire figure
-            title_font=dict(size=18, color="black"),  # Customize title appearance
+            title_font=dict(size=18, color="black", weight=10),  # Customize title appearance
             font=dict(size=12, color="black"),  # Customize font for the entire chart
         )
 

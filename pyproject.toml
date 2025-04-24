@@ -11,6 +11,7 @@ authors = [
 ]
 dependencies = [
     "colorama==0.4.6",
+    "holidays==0.71",
     "keyring==25.6.0",
     "numpy==2.2.4",
     "pandas==2.2.3",

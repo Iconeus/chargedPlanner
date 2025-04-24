@@ -12,6 +12,24 @@ def test_calendar_instance():
 	cal = Calendar()
 	assert cal is not None
 
+def test_calendar_add_holiday():
+
+	from src.chargedPlanner.chargedPlanner import Calendar
+	cal = Calendar()
+
+	cal.add_holiday(datetime(2024, 12, 23).date())
+
+	holidays = cal.get_holidays(
+		start_date=datetime(2024, 12, 20).date(),
+		end_date=datetime(2024, 12, 30).date()
+	)
+
+	assert holidays == [
+		datetime(2024, 12, 23).date(),
+		datetime(2024, 12, 25).date(),
+		datetime(2024, 12, 26).date()
+	]
+
 def test_calendar_date_delta():
 
 	from src.chargedPlanner.chargedPlanner import Calendar
@@ -32,13 +50,26 @@ def test_calendar_add_holiday():
 
 	cal = Calendar()
 
-	cal.add_holiday(datetime(2024,12,27))
+	cal.add_holiday(datetime(2024,12,27).date())
 
-	assert cal.count_working_days(datetime(2024,12,27),datetime(2025,1,2)) == 4
+	assert cal.count_working_days(datetime(2024,12,27).date(),datetime(2025,1,2).date()) == 4
 
-	cal.add_holiday(datetime(2025,1,1), datetime(2025,1,3))
+	cal.add_holiday(datetime(2025,1,1).date(), datetime(2025,1,3).date())
 
-	assert cal.count_working_days(datetime(2024,12,27),datetime(2025,1,4)) == 2
+	assert cal.count_working_days(datetime(2024,12,27).date(),datetime(2025,1,4).date()) == 2
+
+def test_calendar_getHolidays():
+
+	from src.chargedPlanner.chargedPlanner import Calendar
+
+	cal = Calendar()
+
+	h = cal.get_holidays(
+		datetime(2024, 12, 24).date(),
+		datetime(2024, 12, 26).date())
+
+	assert h == [ datetime(2024, 12, 25).date(),
+				  datetime(2024, 12, 26).date() ]
 
 def test_calendar_getDate_after_workDays() : 
 
@@ -46,16 +77,46 @@ def test_calendar_getDate_after_workDays() :
 
 	cal = Calendar()
 
-	cal.add_holiday(datetime(2024,12,27))
+	cal.add_holiday(datetime(2024,12,27).date())
 
 	assert(cal.getDate_after_workDays(startDate =datetime(2024,12,20).date(), requiredWorkDays=3) == datetime(2024,12,24).date())
-	assert(cal.getDate_after_workDays(startDate =datetime(2024,12,24).date(), requiredWorkDays=3) == datetime(2024,12,30).date())
+	assert(cal.getDate_after_workDays(startDate =datetime(2024,12,24).date(), requiredWorkDays=3) == datetime(2024,12,31).date())
 	assert(cal.getDate_after_workDays(startDate =datetime(2024,12,30).date(), requiredWorkDays=4) == datetime(2025,1,2).date())
 
 	with pytest.raises(ValueError):
 		assert (cal.getDate_after_workDays(1, requiredWorkDays=4) == datetime(2025, 1, 2).date())
 	with pytest.raises(ValueError):
-		assert (cal.getDate_after_workDays(startDate=datetime(2024, 12, 30), requiredWorkDays="a"))
+		assert (cal.getDate_after_workDays(startDate=datetime(2024, 12, 30).date(), requiredWorkDays="a"))
+
+def test_calendar_listWorkDays() :
+
+	from src.chargedPlanner.chargedPlanner import Calendar
+
+	cal = Calendar()
+
+	l = cal.listWorkDays(start_date=datetime(2024, 12, 24).date(),
+				   end_date=datetime(2024, 12, 31).date())
+
+	assert l == [
+		datetime(2024, 12, 24).date(),
+		datetime(2024, 12, 27).date(),
+		datetime(2024, 12, 30).date(),
+		datetime(2024, 12, 31).date()
+	]
+
+def test_calendar_listWeekends() :
+
+	from src.chargedPlanner.chargedPlanner import Calendar
+
+	cal = Calendar()
+
+	l = cal.listWeekEnds(start_date=datetime(2024, 12, 24).date(),
+				   end_date=datetime(2024, 12, 31).date())
+
+	assert l == [
+		datetime(2024, 12, 28).date(),
+		datetime(2024, 12, 29).date()
+	]
 
 def test_dev() :
 
@@ -141,8 +202,8 @@ def test_dev_gantt() :
 	dev = DevGroup()["Charles"]
 
 	dev.add_holiday(
-		datetime(2025,1,15),
-		datetime(2025,1,30))
+		datetime(2025,1,15).date(),
+		datetime(2025,1,30).date())
 
 	connFeat = Feature(featName="Connectivity",
 				   		remainingEffort=5,

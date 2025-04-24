@@ -57,7 +57,7 @@ class LuccaAPI(object) :
     def getLeaves(self,lucca_ID : int, start_date : date, end_date = date) -> list :
 
         if not isinstance(lucca_ID, int):
-            print("lucca ID type : ", type(lucca_ID))
+            print("lucca ID type : ", type  (lucca_ID))
             raise ValueError("incompatible lucca ID type")
         if not isinstance(start_date, date):
             print("start date type : ", type(start_date))

@@ -82,9 +82,11 @@ class Calendar(object):
         fr_holidays = holidays.France(years=next_year)
         self.__holidays__ += list(fr_holidays.keys())
 
+        self.__holidays__.sort()
+
         self.__weekends__ = {5, 6}  # Saturday and Sunday
 
-    def add_holiday(self, start_date, end_date=None) -> None:
+    def add_holiday(self, start_date : date, end_date=None) -> None:
 
         if not isinstance(start_date, date):
             raise ValueError("incompatible start_date type")
@@ -99,6 +101,17 @@ class Calendar(object):
         while current_date <= end_date:
             self.__holidays__.append(current_date)
             current_date += timedelta(days=1)
+
+        self.__holidays__.sort()
+
+    def get_holidays(self, start_date : date, end_date : date):
+
+        ret = []
+        for i in self.__holidays__:
+            if start_date <= i and  i <= end_date :
+                ret.append(i)
+
+        return ret
 
     def count_working_days(self, start_date: date, end_date: date) -> int:
 
@@ -568,7 +581,9 @@ class DevGroup(object):
             import plotly.figure_factory as ff
 
             tasks = []
-            for i in self.getCalendar().__holidays__:
+            for i in self.getCalendar().get_holidays(
+                        self.getStartDateForFirstAssignedFeat(),
+                        self.getEndDateForLatestAssignedFeat() ):
                 tasks.append(
                     dict(
                         Task="Holiday",

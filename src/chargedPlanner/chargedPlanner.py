@@ -1005,13 +1005,22 @@ class PersistentFeature(Feature) :
 
             return endDate
 
+''' 
+The FixedTimeSpanTrailingFeature is a Feature desinged to describe testing and documentation tasks 
+Tis Feature : 
+-> Spans on a fixed time interval (ie: this will lasts for 15 days).
+-> Is placed after the end of the last Feature of a Version  
+-> Has an assignee
+-> The effort of the assignee is computed as a % of the sum of the Features of the Version 
+    Rational :  when a person tests (or documents) one version, it works on all features at the time
+'''
 class FixedTimeSpanTrailingFeature(Feature) :
 
     def __init__(
         self,
         featName: str,
         timespan : timedelta,
-        remainingEffort : int,
+        purcentage : int = 5,
         version : Version = None,
         assignee : DevGroup.DevBase = None,
     ) :
@@ -1022,14 +1031,20 @@ class FixedTimeSpanTrailingFeature(Feature) :
             raise ValueError("version is not a Version!")
         if not isinstance(assignee, DevGroup.DevBase):
             raise ValueError("assignee is not a Dev!")
-        if not isinstance(remainingEffort, int):
-            raise ValueError("purcentage is not an int!")
 
         # this feautre starts at the end of the current version
         startDate = version.getEndDate()
 
         # How many workdays since the beginning of th
         workDays = assignee.count_workdays(startDate, startDate+timespan)
+
+        remainingEffort = 0
+        for i in version.__features__ :
+            if not isinstance(i,FixedTimeSpanTrailingFeature) :
+                remainingEffort += purcentage / 100 * i.__remainingEffort__
+
+        # round the value to the highest integer [days]
+        remainingEffort = math.ceil(remainingEffort)
 
         percentageLoad = 100 * remainingEffort / workDays
 
@@ -1039,40 +1054,23 @@ class FixedTimeSpanTrailingFeature(Feature) :
                          percentageLoad=percentageLoad,
                          startDate=startDate)
 
-        # Version is not tied to any Project, and this is not possible
-# this should probably be an inner class of Project
 
 class TestingFeature(FixedTimeSpanTrailingFeature) :
 
     def __init__(
         self,
         timespan : timedelta,
-        version : Version = None,
+        version : Version,
         assignee : DevGroup.DevBase = None,
         purcentage : int = 5,
     ) :
-
-        if not isinstance(version, Version):
-            raise ValueError("version is not a Version!")
-        if not isinstance(assignee, DevGroup.DevBase):
-            raise ValueError("assignee is not a Dev!")
-        if not isinstance(purcentage, int):
-            raise ValueError("purcentage is not an int!")
-
-        remainingEffort = 0
-        for i in version.__features__ :
-            if not isinstance(i,FixedTimeSpanTrailingFeature) :
-                remainingEffort += purcentage / 100 * i.__remainingEffort__
-
-        # round the value to the highest integer [days]
-        remainingEffort = math.ceil(remainingEffort)
 
         featName= version.name() + "_testing"
 
         super().__init__(
                         featName=featName,
                         timespan= timespan,
-                        remainingEffort = remainingEffort,
+                        purcentage = purcentage,
                         version = version,
                         assignee = assignee)
 
@@ -1081,39 +1079,20 @@ class DocumentationFeature(FixedTimeSpanTrailingFeature) :
     def __init__(
         self,
         timespan : timedelta,
-        version : Version = None,
+        version : Version,
         assignee : DevGroup.DevBase = None,
-        purcentage : int = 5,
+        purcentage : int = 5
     ) :
-
-        if not isinstance(version, Version):
-            raise ValueError("version is not a Version!")
-        if not isinstance(assignee, DevGroup.DevBase):
-            raise ValueError("assignee is not a Dev!")
-        if not isinstance(purcentage, int):
-            raise ValueError("purcentage is not an int!")
-
-        remainingEffort = 0
-        for i in version.__features__ :
-            if not isinstance(i,FixedTimeSpanTrailingFeature) :
-                remainingEffort += purcentage / 100 * i.__remainingEffort__
-
-        # round the value to the highest integer [days]
-        remainingEffort = math.ceil(remainingEffort)
 
         featName= version.name() + "_documentation"
 
         super().__init__(
                         featName=featName,
                         timespan= timespan,
-                        remainingEffort = remainingEffort,
+                        purcentage = purcentage,
                         version = version,
                         assignee = assignee)
 
-
-# but : I need to access my version (product milestone) to manipulate the
-# features directly. I must probably interhcange product and version.
-# Version inherits product ?
 
 
 class IconeusProduct(Enum):

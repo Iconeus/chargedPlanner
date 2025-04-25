@@ -27,8 +27,6 @@ At the developer level, the associated workload can be visualised under the form
 
 Three types of features are made avalable : 
 
-#Features
-
 **Feature** are used to describe specific tasks assigned to a developer, and the associated effort  
 
 **PersistentFeature** are used to book the developers time on the whole time span of their activity. Typically this is useful for taking into account persintent / recurrent tasks such as general meeting time. By default, 20% of the developers time is assigned to meetings via a **PersistentFeature**

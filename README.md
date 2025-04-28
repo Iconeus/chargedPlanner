@@ -4,7 +4,7 @@ DevTeam Gantt Planner is a Python-based tool designed to assist development team
 
 ## Features
 
-Project Scheduling: Define features, define the required effort, assign them to developers within the DevTeam. Outline project timelines.
+Project Scheduling: Define Features, define the required effort, assign them to developers within the DevTeam. Outline project timelines.
 
 Lucca Integration : the Lucca API can be leveraged to retrieve the holidays of the developers. Project planning will be modified accordingly 
 
@@ -21,6 +21,17 @@ At the developer level, the associated workload can be visualised under the form
 ![image](https://github.com/Iconeus/chargedPlanner/blob/main/docs/images/DevGantt.PNG)
 
 ![image](https://github.com/Iconeus/chargedPlanner/blob/main/docs/images/DevCharge.PNG)
+
+
+## Feature type 
+
+Three types of features are made avalable : 
+
+**Feature** are used to describe specific tasks assigned to a developer, and the associated effort  
+
+**PersistentFeature** are used to book the developers time on the whole time span of their activity. Typically this is useful for taking into account persintent / recurrent tasks such as general meeting time. By default, 20% of the developers time is assigned to meetings via a **PersistentFeature**
+
+**TestingFeature** and **DocumentationFeature** are specific Features that append at the end of a Version. While their lenght is fixed (ie: 15days) the effor required to the assigned developer is computed as a percentage of the global effort required for the version. 
 
 
 ## User Installation

@@ -1,49 +1,21 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
+
 import numbers
 import math
-import os
-import sys
 from enum import Enum
 from typing import Dict
 import json
-from pathlib import Path
 
 from pyexpat import features
 
+from chargedPlanner.tools import is_running_under_pytest
+
 import pandas.core.frame
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(current_dir)
-
-def is_running_under_pytest():
-    return "PYTEST_CURRENT_TEST" in os.environ
-
 
 def defaultFilter(feat):
     return True
-
-def get_config_filePath() -> Path :
-
-    user_config_path = os.path.expanduser("~/.config/chargedPlanner/config.json")
-    if os.path.exists(user_config_path):
-        return Path(user_config_path)
-
-    else:
-        from colorama import init, Fore
-
-        init(autoreset=True)
-        print(
-            Fore.RED
-            + "Please add your own config.json in : ~/.config/chargedPlanner/config.json"
-        )
-        print(
-            "local config.json will be used in the meanwhile : "
-            + current_dir
-            + "/config.json"
-        )
-        return Path(current_dir + "/data/config.json")
 
 def prepare_for_gantt(tasks : list) -> [pandas.core.frame.DataFrame, dict] :
 
@@ -235,7 +207,7 @@ class Calendar(object):
             str += "\n\t" + i.__str__()
         return str
 
-from decorators import singleton
+from chargedPlanner.decorators import singleton
 
 @singleton
 class DevGroup(object):
@@ -830,7 +802,7 @@ class DevGroup(object):
         dev = next((d for d in self.__devs__ if d.__name__ == key), None)
 
         if not dev:
-
+            from chargedPlanner.tools import get_config_filePath
             with open(get_config_filePath(), "r") as f:
                 devDict = json.load(f)
                 f.close()

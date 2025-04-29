@@ -2,8 +2,8 @@ import datetime
 from datetime import date
 from ratelimit import limits, sleep_and_retry
 
-from decorators import singleton
-from chargedPlanner import get_config_filePath
+from chargedPlanner.decorators import singleton
+from chargedPlanner.tools import get_config_filePath
 
 @singleton
 class LuccaAPI(object) :

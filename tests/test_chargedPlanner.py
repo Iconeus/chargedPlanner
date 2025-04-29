@@ -1,20 +1,19 @@
 import pytest
 from datetime import datetime, timedelta
 
-
 def test_setup():
-	from src.chargedPlanner.chargedPlanner import DevGroup
+	from chargedPlanner.chargedPlanner import DevGroup
 	DevGroup.reset_instance()  # Clear all instances
 
 def test_calendar_instance():
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 	cal = Calendar()
 	assert cal is not None
 
 def test_calendar_add_holiday():
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 	cal = Calendar()
 
 	cal.add_holiday(datetime(2024, 12, 23).date())
@@ -32,7 +31,7 @@ def test_calendar_add_holiday():
 
 def test_calendar_date_delta():
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 	cal = Calendar()
 	assert cal.count_working_days(datetime(2024,12,27).date(),datetime(2025,1,2).date()) == 5
 
@@ -44,7 +43,7 @@ def test_calendar_date_delta():
 
 def test_calendar_add_holiday():
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 
 	test_calendar_date_delta()
 
@@ -60,7 +59,7 @@ def test_calendar_add_holiday():
 
 def test_calendar_getHolidays():
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 
 	cal = Calendar()
 
@@ -73,7 +72,7 @@ def test_calendar_getHolidays():
 
 def test_calendar_getDate_after_workDays() : 
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 
 	cal = Calendar()
 
@@ -90,7 +89,7 @@ def test_calendar_getDate_after_workDays() :
 
 def test_calendar_listWorkDays() :
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 
 	cal = Calendar()
 
@@ -106,7 +105,7 @@ def test_calendar_listWorkDays() :
 
 def test_calendar_listWeekends() :
 
-	from src.chargedPlanner.chargedPlanner import Calendar
+	from chargedPlanner.chargedPlanner import Calendar
 
 	cal = Calendar()
 
@@ -120,7 +119,7 @@ def test_calendar_listWeekends() :
 
 def test_dev() :
 
-	from src.chargedPlanner.chargedPlanner import DevGroup
+	from chargedPlanner.chargedPlanner import DevGroup
 
 	charles = DevGroup()["Charles"]
 
@@ -137,7 +136,7 @@ def test_feat() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup,Feature
+	from chargedPlanner.chargedPlanner import DevGroup,Feature
 
 	remainingEffort= 5
 	purcConnect = 30
@@ -186,7 +185,7 @@ def test_dev() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature
+	from chargedPlanner.chargedPlanner import DevGroup, Feature
 
 	dev = DevGroup()["Daniele"]
 	assert dev.__name__ == "Daniele"
@@ -197,7 +196,7 @@ def test_dev_gantt() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature
+	from chargedPlanner.chargedPlanner import DevGroup, Feature
 
 	dev = DevGroup()["Charles"]
 
@@ -243,7 +242,7 @@ def test_figure() :
 		for i in range(1, 15)
 	]
 
-	from src.chargedPlanner.chargedPlanner import prepare_for_gantt
+	from chargedPlanner.chargedPlanner import prepare_for_gantt
 	[df, color_dict] = prepare_for_gantt(tasks)
 
 	# Create Gantt Chart
@@ -259,7 +258,7 @@ def test_version() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion
 
 	version = IcoStudioVersion("1.0.0")
 
@@ -299,7 +298,7 @@ def test_version() :
 
 	assert(version.getEndDate() == datetime(2025, 2, 12).date())
 
-	from src.chargedPlanner.chargedPlanner import IcoScanVersion, IcoLabVersion
+	from chargedPlanner.chargedPlanner import IcoScanVersion, IcoLabVersion
 	version = IcoLabVersion("1.0.0")
 	version = IcoScanVersion("1.0.0")
 
@@ -307,7 +306,7 @@ def test_testing_feat() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature, TestingFeature, IcoStudioVersion
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, TestingFeature, IcoStudioVersion
 
 	version = IcoStudioVersion("1.0.0")
 
@@ -359,7 +358,7 @@ def test_documentation_feat() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import (DevGroup, Feature,
+	from chargedPlanner.chargedPlanner import (DevGroup, Feature,
 												   TestingFeature, DocumentationFeature,
 												   IcoStudioVersion)
 
@@ -428,7 +427,7 @@ def test_project() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, IcoLabVersion, Project, IconeusProduct
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, IcoLabVersion, Project, IconeusProduct
 
 	charles = DevGroup()["Charles"]
 	selene = DevGroup()["Selene"]
@@ -493,7 +492,7 @@ def test_serialise_project() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
 
 	charles = DevGroup()['Charles']
 	selene = DevGroup()['Selene']
@@ -558,7 +557,7 @@ def test_unSerialise_project() :
 
 	test_setup()
 
-	from src.chargedPlanner.chargedPlanner import DevGroup, Project, IconeusProduct, IcoStudioVersion
+	from chargedPlanner.chargedPlanner import DevGroup, Project, IconeusProduct, IcoStudioVersion
 
 	project = Project.unserialise()
 

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 def test_lucca_api():
 
-    from src.chargedPlanner.LuccaAPI import LuccaAPI
+    from chargedPlanner.LuccaAPI import LuccaAPI
 
     l = LuccaAPI()
 

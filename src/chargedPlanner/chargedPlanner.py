@@ -544,7 +544,7 @@ class DevGroup(object):
             startDate = datetime.today().date()
             endDate = startDate + timedelta(days=120)
 
-            from LuccaAPI import LuccaAPI
+            from chargedPlanner.LuccaAPI import LuccaAPI
             for i in LuccaAPI().getLeaves(luccaID,startDate,endDate) :
                 self.add_holiday(i,i)
 

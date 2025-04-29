@@ -40,7 +40,7 @@ class LuccaAPI(object) :
 
     # Define the rate limit: 5 calls per minute
     @sleep_and_retry
-    @limits(calls=30, period=60)
+    @limits(calls=1, period=2)
     def __post__(self,url : str):
 
         # Lucca API Token not filled, cannot send the request

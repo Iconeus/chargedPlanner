@@ -1064,6 +1064,26 @@ class TestingFeature(FixedTimeSpanTrailingFeature) :
                         version = version,
                         assignee = assignee)
 
+class DebugFeature(FixedTimeSpanTrailingFeature) :
+
+    def __init__(
+        self,
+        timespan : timedelta,
+        version : Version,
+        assignee : DevGroup.DevBase = None,
+        percentageLoad : int = 5,
+    ) :
+
+        featName= version.name() + "_debug"
+
+        super().__init__(
+                        featName=featName,
+                        timespan= timespan,
+                        percentageLoad = percentageLoad,
+                        version = version,
+                        assignee = assignee)
+
+
 class DocumentationFeature(FixedTimeSpanTrailingFeature) :
 
     def __init__(

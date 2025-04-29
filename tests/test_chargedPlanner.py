@@ -315,7 +315,7 @@ def test_testing_feat() :
 
 	test_setup()
 
-	from chargedPlanner.chargedPlanner import DevGroup, Feature, TestingFeature, IcoStudioVersion
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, TestingFeature, DebugFeature, IcoStudioVersion
 
 	version = IcoStudioVersion("1.0.0")
 
@@ -347,9 +347,23 @@ def test_testing_feat() :
 	version.addFeat(seedMapFeat)
 	version.addFeat(scanv2Feat)
 
-	testing = TestingFeature(
+	testingSJ = TestingFeature(
 		version=version,
 		assignee=selene,
+		percentageLoad=5,
+		timespan=timedelta(days=15)
+	)
+
+	testingCS = TestingFeature(
+		version=version,
+		assignee=charles,
+		percentageLoad=5,
+		timespan=timedelta(days=15)
+	)
+
+	debugCS = DebugFeature(
+		version=version,
+		assignee=charles,
 		percentageLoad=5,
 		timespan=timedelta(days=15)
 	)
@@ -357,14 +371,14 @@ def test_testing_feat() :
 	# Well, I ask for testing during 15 days and I get back a timedelta of 14 days...
 	# certainly not ideal, the issue is that the timeframes are computed via ceils, that
 	# round up the actual values. Not a big deal though...
-	assert( testing.getEndDate() - testing.getStartDate() == timedelta(days=14) )
+	assert( testingSJ.getEndDate() - testingSJ.getStartDate() == timedelta(days=14) )
 
-	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
-	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
+	assert( testingSJ.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testingSJ.getEndDate() == datetime(2025, 3, 5).date() )
 
-	version.addFeat(testing)
+	version.addFeat(testingSJ)
 
-	assert( testing.getEndDate() == version.getEndDate() )
+	assert( testingSJ.getEndDate() == version.getEndDate() )
 
 	print(version)
 

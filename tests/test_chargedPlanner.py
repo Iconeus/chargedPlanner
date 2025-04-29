@@ -350,7 +350,7 @@ def test_testing_feat() :
 	testing = TestingFeature(
 		version=version,
 		assignee=selene,
-		purcentage=5,
+		percentageLoad=5,
 		timespan=timedelta(days=15)
 	)
 
@@ -413,7 +413,7 @@ def test_documentation_feat() :
 	testing = TestingFeature(
 		version=version,
 		assignee=selene,
-		purcentage=5,
+		percentageLoad=5,
 		timespan=timedelta(days=15)
 	)
 

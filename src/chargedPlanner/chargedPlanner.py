@@ -1009,7 +1009,7 @@ class FixedTimeSpanTrailingFeature(Feature) :
         self,
         featName: str,
         timespan : timedelta,
-        purcentage : int = 5,
+        percentageLoad : int = 5,
         version : Version = None,
         assignee : DevGroup.DevBase = None,
     ) :
@@ -1030,7 +1030,7 @@ class FixedTimeSpanTrailingFeature(Feature) :
         totalEffort = 0
         for i in version.__features__ :
             if not isinstance(i,FixedTimeSpanTrailingFeature) :
-                totalEffort += purcentage / 100 * i.__totalEffort__
+                totalEffort += percentageLoad / 100 * i.__totalEffort__
 
         # round the value to the highest integer [days]
         totalEffort = math.ceil(totalEffort)
@@ -1052,7 +1052,7 @@ class TestingFeature(FixedTimeSpanTrailingFeature) :
         timespan : timedelta,
         version : Version,
         assignee : DevGroup.DevBase = None,
-        purcentage : int = 5,
+        percentageLoad : int = 5,
     ) :
 
         featName= version.name() + "_testing"
@@ -1060,7 +1060,7 @@ class TestingFeature(FixedTimeSpanTrailingFeature) :
         super().__init__(
                         featName=featName,
                         timespan= timespan,
-                        purcentage = purcentage,
+                        percentageLoad = percentageLoad,
                         version = version,
                         assignee = assignee)
 
@@ -1079,7 +1079,7 @@ class DocumentationFeature(FixedTimeSpanTrailingFeature) :
         super().__init__(
                         featName=featName,
                         timespan= timespan,
-                        purcentage = percentageLoad,
+                        percentageLoad = percentageLoad,
                         version = version,
                         assignee = assignee)
 

@@ -1,4 +1,7 @@
+import datetime
 from datetime import date
+from ratelimit import limits, sleep_and_retry
+
 from src.chargedPlanner.decorators import singleton
 from src.chargedPlanner.chargedPlanner import get_config_filePath
 
@@ -35,6 +38,9 @@ class LuccaAPI(object) :
 
     # =====================================================
 
+    # Define the rate limit: 5 calls per minute
+    @sleep_and_retry
+    @limits(calls=30, period=60)
     def __post__(self,url : str):
 
         # Lucca API Token not filled, cannot send the request
@@ -54,7 +60,7 @@ class LuccaAPI(object) :
 
         return response.json()
 
-    def getLeaves(self,lucca_ID : int, start_date : date, end_date = date) -> list :
+    def getLeaves(self,lucca_ID : int, start_date : date, end_date = date) -> list[datetime.date] :
 
         if not isinstance(lucca_ID, int):
             print("lucca ID type : ", type  (lucca_ID))
@@ -114,6 +120,9 @@ class LuccaAPI(object) :
         aggregated = df.groupby("date")["duration"].sum().reset_index()
 
         # Convert back to a desired format
-        return aggregated.to_dict(orient="records")
+        d= aggregated.to_dict(orient="records")
+
+        # Return a list of datetime.dates
+        return [item['date'].date() for item in d]
 
 

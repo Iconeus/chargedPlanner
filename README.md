@@ -112,12 +112,30 @@ scanV2Feat = Feature(featName="ScanV2",
                      percentageLoad=40,
                      startDate=charles.getEndDateForLatestAssignedFeat())
 
+testing = TestingFeature(
+        version=version1,
+        assignee=selene,
+        purcentage=5,
+        timespan=timedelta(days=15)
+    )
+
+documentation = DocumentationFeature(
+        version=version1,
+        assignee=daniele,
+        purcentage=5,
+        timespan=timedelta(days=15)
+    )
+
 version1 = IcoStudioVersion("1.0.0")
 version1.addFeat(connFeat)
 version1.addFeat(seedMapFeat)
+version1.addFeat(testing)
+version1.addFeat(documentation)
 
 version2 = IcoStudioVersion("1.1.0")
 version2.addFeat(scanV2Feat)
+version2.addFeat(testing)
+version2.addFeat(documentation)
 
 icoStudioProject = Project(IconeusProduct.IcoStudio)
 icoStudioProject.addVersion(version1)

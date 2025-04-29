@@ -574,7 +574,7 @@ class DevGroup(object):
 
             from LuccaAPI import LuccaAPI
             for i in LuccaAPI().getLeaves(luccaID,startDate,endDate) :
-                self.add_holiday(i["date"],i["date"])
+                self.add_holiday(i,i)
 
         def gantt(self) -> None:
 

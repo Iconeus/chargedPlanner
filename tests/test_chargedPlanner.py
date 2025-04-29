@@ -138,19 +138,21 @@ def test_feat() :
 
 	from chargedPlanner.chargedPlanner import DevGroup,Feature
 
-	remainingEffort= 5
-	purcConnect = 30
-
 	dev = DevGroup()["Charles"]
 
+	remainingEffort = 5
+	purcConnect = 30
+
 	connFeat = Feature(featName="Connectivity",
+						totalEffort=7,
 						remainingEffort=remainingEffort,
 				   		assignee=dev,
 						percentageLoad=purcConnect,
 					   	startDate= datetime(2024, 12, 27).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
-				   			remainingEffort=10,
+							totalEffort=10,
+						  	remainingEffort=10,
 				   			assignee=dev,
 							percentageLoad=20,
 	   						startDate=datetime(2024, 12, 27).date())
@@ -205,25 +207,29 @@ def test_dev_gantt() :
 		datetime(2025,1,30).date())
 
 	connFeat = Feature(featName="Connectivity",
+				   		totalEffort=5,
 				   		remainingEffort=5,
 				   		assignee=dev,
 					   	percentageLoad=80,
 				 		startDate=datetime(2024,12,26).date())
 
 	refactor = Feature(featName="Refactor",
-				   			remainingEffort=10,
+						   totalEffort=10,
+						   remainingEffort=10,
 				   			assignee=dev,
 						  	percentageLoad=20,
 							startDate = dev.getEndDateForLatestAssignedFeat())
 
 	seedMapFeat = Feature(featName="SeedMap",
-				   			remainingEffort=10,
+						  totalEffort=12,
+						  remainingEffort=10,
 				   			assignee=dev,
 						  	percentageLoad=20,
 							startDate = datetime(2024, 12, 26).date())
 
 	scanv2Feat = Feature(featName="ScanV2",
-				   			remainingEffort=4,
+						 totalEffort=5,
+						 remainingEffort=4,
 				   			assignee=dev,
 						 	percentageLoad=90,
 						 	startDate = datetime(2025, 2, 2).date())
@@ -263,15 +269,18 @@ def test_version() :
 	version = IcoStudioVersion("1.0.0")
 
 	connFeat = Feature(featName="Connectivity",
-				   		remainingEffort=5,
+					   totalEffort=10,
+					   remainingEffort=5,
 						startDate=datetime(2024, 12, 26).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
-				   remainingEffort=10,
+						  totalEffort=10,
+						  remainingEffort=10,
 					startDate = datetime(2024, 12, 26).date())
 
 	scanv2Feat = Feature(featName="ScanV2",
-				   remainingEffort=4,
+						 totalEffort=6,
+						 remainingEffort=4,
 					startDate = datetime(2025, 2, 2).date())
 
 	version.addFeat(connFeat)
@@ -314,19 +323,22 @@ def test_testing_feat() :
 	charles = DevGroup()["Charles"]
 
 	connFeat = Feature(featName="Connectivity",
-				   		remainingEffort=5,
+					   totalEffort=6,
+					   remainingEffort=5,
 						assignee=charles,
 					    percentageLoad = 20,
 						startDate=datetime(2024, 12, 26).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
 						  assignee=selene,
+						  totalEffort=11,
 						  remainingEffort=10,
 						  percentageLoad=40,
 						  startDate = datetime(2024, 12, 26).date())
 
 	scanv2Feat = Feature(featName="ScanV2",
 						 assignee=charles,
+						 totalEffort=6,
 						 remainingEffort=4,
 						 percentageLoad=30,
 						 startDate = datetime(2025, 2, 2).date())
@@ -341,6 +353,11 @@ def test_testing_feat() :
 		purcentage=5,
 		timespan=timedelta(days=15)
 	)
+
+	# Well, I ask for testing during 15 days and I get back a timedelta of 14 days...
+	# certainly not ideal, the issue is that the timeframes are computed via ceils, that
+	# round up the actual values. Not a big deal though...
+	assert( testing.getEndDate() - testing.getStartDate() == timedelta(days=14) )
 
 	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
 	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
@@ -369,19 +386,22 @@ def test_documentation_feat() :
 	daniele = DevGroup()["Daniele"]
 
 	connFeat = Feature(featName="Connectivity",
-				   		remainingEffort=5,
+					   totalEffort=10,
+					   remainingEffort=5,
 						assignee=charles,
 					    percentageLoad = 20,
 						startDate=datetime(2024, 12, 26).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
 						  assignee=selene,
+						  totalEffort=10,
 						  remainingEffort=10,
 						  percentageLoad=40,
 						  startDate = datetime(2024, 12, 26).date())
 
 	scanv2Feat = Feature(featName="ScanV2",
 						 assignee=charles,
+						 totalEffort=5,
 						 remainingEffort=4,
 						 percentageLoad=30,
 						 startDate = datetime(2025, 2, 2).date())
@@ -407,7 +427,7 @@ def test_documentation_feat() :
 	documentation = DocumentationFeature(
 		version=version,
 		assignee=daniele,
-		purcentage=5,
+		percentageLoad=5,
 		timespan=timedelta(days=15)
 	)
 
@@ -433,18 +453,21 @@ def test_project() :
 	selene = DevGroup()["Selene"]
 
 	connFeat = Feature(featName="Connectivity",
+					   totalEffort=6,
 					   remainingEffort=5,
 					   assignee=charles,
 					   percentageLoad = 20,
 					   startDate=datetime(2024, 12, 26).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
+							totalEffort=15,
 						  remainingEffort=15,
 						  assignee=selene,
 						  percentageLoad=20,
 						  startDate=datetime(2024, 11, 15).date())
 
 	scanV2Feat = Feature(featName="ScanV2",
+						totalEffort=20,
 					   	remainingEffort=15,
 						 assignee=charles,
 						 percentageLoad=40,
@@ -498,19 +521,22 @@ def test_serialise_project() :
 	selene = DevGroup()['Selene']
 
 	connFeat = Feature(featName="Connectivity",
+					   totalEffort=6,
 					   remainingEffort=5,
 					   assignee=charles,
 					   percentageLoad = 20,
 					   startDate=datetime(2024, 12, 26).date())
 
 	seedMapFeat = Feature(featName="SeedMap",
+						  totalEffort=20,
 						  remainingEffort=15,
 						  assignee=selene,
 						  percentageLoad=20,
 						  startDate=datetime(2024, 11, 15).date())
 
 	scanV2Feat = Feature(featName="ScanV2",
-					   	remainingEffort=15,
+						 totalEffort=15,
+						 remainingEffort=15,
 						 assignee=charles,
 						 percentageLoad=40,
 						 startDate=datetime(2025, 1, 8).date())

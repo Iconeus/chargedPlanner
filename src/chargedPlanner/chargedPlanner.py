@@ -541,6 +541,10 @@ class DevGroup(object):
 
         def luccaConnector(self, luccaID : int) -> None :
 
+            # Disable the LUCCA connection for the time being.
+            # See also https://github.com/Iconeus/chargedPlanner/issues/35
+            return
+
             startDate = datetime.today().date()
             endDate = startDate + timedelta(days=120)
 
@@ -821,6 +825,7 @@ class Feature(object):
     def __init__(
         self,
         featName: str,
+        totalEffort: int,
         remainingEffort: int,
         assignee: DevGroup.DevBase = None,
         percentageLoad: numbers.Number = 0,
@@ -829,6 +834,8 @@ class Feature(object):
 
         if not isinstance(featName, str):
             raise ValueError("featName is not a str!")
+        if not isinstance(totalEffort, int):
+            raise ValueError("totalEffort is not an int!")
         if not isinstance(remainingEffort, int):
             raise ValueError("remainingEffort is not an int!")
         if not isinstance(startDate, date):
@@ -836,6 +843,7 @@ class Feature(object):
 
         self.__name__ = featName
         self.__startDate__ = startDate
+        self.__totalEffort__ = totalEffort
         self.__remainingEffort__ = remainingEffort
         self.__assignee__ = None
 
@@ -871,6 +879,7 @@ class Feature(object):
         return {
             "FeatureName": self.__name__,
             "StartDate": str(self.__startDate__),
+            "TotalEffort": str(self.__totalEffort__),
             "RemainingEffort": str(self.__remainingEffort__),
             "Assignee": self.__assignee__.to_dict(),
             "PercentageLoad": self.getPurcentageLoad(),
@@ -887,9 +896,13 @@ class Feature(object):
 
         purcLoad = data["PercentageLoad"] * 100
 
+        remainingEffort = int(data["RemainingEffort"])
+        totalEffort = int(data["TotalEffort"]) if "TotalEffort" in data else remainingEffort
+
         tmp = cls(
             featName=data["FeatureName"],
-            remainingEffort=int(data["RemainingEffort"]),
+            totalEffort=totalEffort,
+            remainingEffort=remainingEffort,
             startDate=datetime.strptime(data["StartDate"], "%Y-%m-%d").date(),
         )
 
@@ -908,6 +921,7 @@ class Feature(object):
             return (
                 self.__name__ == other.__name__
                 and self.__remainingEffort__ == other.__remainingEffort__
+                and self.__totalEffort__ == other.__totalEffort__
             )
         """Remove the dates : I cannot have two projects with the
         same features and the same schedule (otherwise I am
@@ -933,6 +947,8 @@ class Feature(object):
             + self.__assignee__.__str__()
             + "\n\tStart date : "
             + self.__startDate__.__str__()
+            + "\n\tTotal effort :"
+            + self.__totalEffort__.__str__()
             + "\n\tRemaining effort :"
             + self.__remainingEffort__.__str__()
         )
@@ -948,6 +964,7 @@ class PersistentFeature(Feature) :
             ):
 
             super().__init__(featName=featName,
+                             totalEffort = 1,
                              remainingEffort = 1,
                              assignee=assignee,
                              percentageLoad=percentageLoad,
@@ -1004,24 +1021,25 @@ class FixedTimeSpanTrailingFeature(Feature) :
         if not isinstance(assignee, DevGroup.DevBase):
             raise ValueError("assignee is not a Dev!")
 
-        # this feautre starts at the end of the current version
+        # this featutre starts at the end of the current version
         startDate = version.getEndDate()
 
-        # How many workdays since the beginning of th
+        # How many workdays since the starting ? +1 to fix boundary conditions
         workDays = assignee.count_workdays(startDate, startDate+timespan)
 
-        remainingEffort = 0
+        totalEffort = 0
         for i in version.__features__ :
             if not isinstance(i,FixedTimeSpanTrailingFeature) :
-                remainingEffort += purcentage / 100 * i.__remainingEffort__
+                totalEffort += purcentage / 100 * i.__totalEffort__
 
         # round the value to the highest integer [days]
-        remainingEffort = math.ceil(remainingEffort)
+        totalEffort = math.ceil(totalEffort)
 
-        percentageLoad = 100 * remainingEffort / workDays
+        percentageLoad = 100 * totalEffort / (workDays)
 
         super().__init__(featName=featName,
-                         remainingEffort = remainingEffort,
+                         totalEffort = totalEffort,
+                         remainingEffort = totalEffort,
                          assignee=assignee,
                          percentageLoad=percentageLoad,
                          startDate=startDate)
@@ -1053,7 +1071,7 @@ class DocumentationFeature(FixedTimeSpanTrailingFeature) :
         timespan : timedelta,
         version : Version,
         assignee : DevGroup.DevBase = None,
-        purcentage : int = 5
+        percentageLoad : int = 5
     ) :
 
         featName= version.name() + "_documentation"
@@ -1061,7 +1079,7 @@ class DocumentationFeature(FixedTimeSpanTrailingFeature) :
         super().__init__(
                         featName=featName,
                         timespan= timespan,
-                        purcentage = purcentage,
+                        purcentage = percentageLoad,
                         version = version,
                         assignee = assignee)
 

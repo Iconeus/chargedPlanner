@@ -18,8 +18,9 @@ def test_lucca_api():
 
     print(ans)
 
-    ans = l.getLeaves(
-        lucca_ID,
-        start_date= datetime(2025, 4, 29).date(),
-        end_date= datetime(2025, 5, 3).date()
-    )
+    for i in range(5) :
+        ans = l.getLeaves(
+            lucca_ID,
+            start_date= datetime(2025, 1, 1).date(),
+            end_date= datetime(2025, 5, 1).date()
+        )

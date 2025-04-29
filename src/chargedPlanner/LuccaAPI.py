@@ -40,7 +40,7 @@ class LuccaAPI(object) :
 
     # Define the rate limit: 5 calls per minute
     @sleep_and_retry
-    @limits(calls=1, period=2)
+    @limits()
     def __post__(self,url : str):
 
         # Lucca API Token not filled, cannot send the request
@@ -54,7 +54,7 @@ class LuccaAPI(object) :
 
         # Check the response
         if response.status_code == 200:
-            print("Success !")  # If the response is JSON, parse and print it
+            print("Success 200!")  # If the response is JSON, parse and print it
         else:
             raise Exception(f"Error {response.status_code}: {response.text}")
 

@@ -22,5 +22,5 @@ def test_lucca_api():
         ans = l.getLeaves(
             lucca_ID,
             start_date= datetime(2025, 1, 1).date(),
-            end_date= datetime(2025, 1, 7).date()
+            end_date= datetime(2025, 12, 30).date()
         )

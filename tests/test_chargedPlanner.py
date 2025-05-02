@@ -126,11 +126,21 @@ def test_dev() :
 	charles.add_holiday(
 		datetime(2024,12,27).date(),
 		datetime(2025,1,4).date())
+
 	print(charles)
 
 	assert charles.get_workdays(
 		datetime(2024, 12, 23).date(),
 		datetime(2025, 1, 10).date()) == 7
+
+	assert charles.get_holydays(
+		datetime(2024, 12, 23).date(),
+		datetime(2025, 1, 10).date()
+		) == [
+			datetime(2024, 12, 27).date(),
+			datetime(2025, 1, 4).date()
+		]
+
 
 def test_feat() :
 

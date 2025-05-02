@@ -76,7 +76,9 @@ class Calendar(object):
 
         self.__holidays__.sort()
 
-    def get_holidays(self, start_date : date, end_date : date):
+    def get_holidays(self,
+                     start_date : date = datetime.today().date(),
+                     end_date : date = datetime.today().date()+timedelta(days=365)) -> list[date] :
 
         ret = []
         for i in self.__holidays__:
@@ -484,6 +486,9 @@ class DevGroup(object):
         def add_holiday(self, start_date: date, end_date: date) -> None:
             self.getCalendar().add_holiday(start_date, end_date)
 
+        def get_holydays(self) -> list[datetime.date]:
+            return self.getCalendar().get_holidays()
+
         def count_workdays(self, start_date: date, end_date: date) -> int:
             return self.getCalendar().count_working_days(start_date, end_date)
 
@@ -540,10 +545,6 @@ class DevGroup(object):
             return self.getWorkload().getTimeFrame()
 
         def luccaConnector(self, luccaID : int) -> None :
-
-            # Disable the LUCCA connection for the time being.
-            # See also https://github.com/Iconeus/chargedPlanner/issues/35
-            return
 
             startDate = datetime.today().date()
             endDate = startDate + timedelta(days=120)

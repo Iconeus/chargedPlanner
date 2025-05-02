@@ -70,7 +70,10 @@ class LuccaAPI(object) :
             raise ValueError("incompatible end_date type")
 
         data = []
-        url = "?leavePeriod.ownerId=" + str(lucca_ID) + "&date=between," + str(start_date) + "," + str(end_date)
+        url = ("?leavePeriod.ownerId=" + str(lucca_ID) + "&date=between," +
+               str(start_date) + "," + str(end_date) +
+               "&fields=date,leaveAccount.name,isam")
+
         ans = self.__post__(url)
 
         if ans == None :
@@ -82,26 +85,14 @@ class LuccaAPI(object) :
         if not len(ans["data"]["items"]) :
             return []
 
-        for i in ans["data"]["items"] :
+        for leave in ans["data"]["items"] :
 
-            leave = self.__post__("/"+i['id'])
-
-            # print("\t", "date : ", leave['data']['date'])
-            # print("\t", "startDate : ", leave['data']['startDateTime'])
-            # print("\t", "isRemoteWork : ", leave['data']['isRemoteWork'])
-            # print("\t", "startsAt : ", leave['data']['startsAt'])
-            # print("\t", "endsAt : ", leave['data']['endsAt'])
-            # print("\t", "leaveAccountDuration : ", leave['data']['leaveAccountDuration'])
-
-            # there is only a flag used to define remote working in the current Iconeus framework.
-            # Why did they not use the flag 'isremotework' ?
-            if leave['data']['leaveAccount']['name'] == 'Télétravail' :
+            if leave["leaveAccount"]["name"] == 'Télétravail' :
                 continue
 
             from datetime import datetime
-            data.append({"date": datetime.strptime(leave["data"]["date"], "%Y-%m-%dT%H:%M:%S"),
-                         "time_period": "AM" if leave["data"]["isAM"] == True else "PM",
-                         "duration": leave["data"]["leaveAccountDuration"]
+            data.append({"date": datetime.strptime(leave["date"], "%Y-%m-%dT%H:%M:%S"),
+                         "time_period": "AM" if leave["isAM"] == True else "PM"
                          })
 
         # in  the case only remote working was defined in the given time span
@@ -114,7 +105,7 @@ class LuccaAPI(object) :
         df = DataFrame(data)
 
         # Aggregate by date and duration
-        aggregated = df.groupby("date")["duration"].sum().reset_index()
+        aggregated = df.groupby("date")["time_period"].sum().reset_index()
 
         # Convert back to a desired format
         d= aggregated.to_dict(orient="records")

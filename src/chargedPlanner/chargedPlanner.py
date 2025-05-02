@@ -1201,8 +1201,9 @@ class Version(object):
         for index, value in enumerate(fig.data[: len(tasks)]):
             taskName= value['name']
             correspondingTaskIndex = next((i for i, task in enumerate(tasks) if task['Task'] == taskName), -1)
-            if correspondingTaskIndex == -1 :
-                raise ValueError("Index not found !")
+            # in the plot data there are several objects, some (ie: legends) do not match the taks names so their
+            # index is not found
+            if correspondingTaskIndex != -1 :
             value.update(text="Assignee: " + tasks[correspondingTaskIndex]["Assignee"], hoverinfo="text")
 
         current_date = datetime.today().strftime("%Y-%m-%d")

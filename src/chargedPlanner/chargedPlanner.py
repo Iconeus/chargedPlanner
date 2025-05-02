@@ -1204,7 +1204,7 @@ class Version(object):
             # in the plot data there are several objects, some (ie: legends) do not match the taks names so their
             # index is not found
             if correspondingTaskIndex != -1 :
-            value.update(text="Assignee: " + tasks[correspondingTaskIndex]["Assignee"], hoverinfo="text")
+                value.update(text="Assignee: " + tasks[correspondingTaskIndex]["Assignee"], hoverinfo="text")
 
         current_date = datetime.today().strftime("%Y-%m-%d")
 

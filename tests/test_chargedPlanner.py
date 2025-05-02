@@ -160,6 +160,8 @@ def test_feat() :
 						percentageLoad=purcConnect,
 					   	startDate= datetime(2024, 12, 27).date())
 
+	assert connFeat.getEndDate() == datetime(2025, 1, 17).date()
+
 	seedMapFeat = Feature(featName="SeedMap",
 							totalEffort=10,
 						  	remainingEffort=10,

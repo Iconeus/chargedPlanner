@@ -307,7 +307,7 @@ class DevGroup(object):
                 # Initially this parameter was only set as % load
                 # After the introduction of the remainingEffort, we choose to not modify the end date of the features
                 # but to modulate the % load as the remainingEffort decreases
-                self.__chargedWorkItems__[feature] = feature.__remainingEffort__ / feature.__totalEffort__ * percentageLoad / 100
+                self.__chargedWorkItems__[feature] = percentageLoad / 100
 
                 self.checkWorkload(feature.getStartDate(), feature.getEndDate())
 
@@ -954,9 +954,9 @@ class Feature(object):
             + self.__assignee__.__str__()
             + "\n\tStart date : "
             + self.__startDate__.__str__()
-            + "\n\tTotal effort :"
+            + "\n\tTotal effort : "
             + self.__totalEffort__.__str__()
-            + "\n\tRemaining effort :"
+            + "\n\tRemaining effort : "
             + self.__remainingEffort__.__str__()
         )
         return str
@@ -1463,7 +1463,8 @@ class Project(object):
         return False
 
     def __str__(self) -> None:
-        str = "Project " + self.__product__.name + "\n"
+        str = "=============================\n"
+        str += "Project " + self.__product__.name + "\n"
         for i in self.__versions__:
             str += "\t" + i.__str__()
         return str

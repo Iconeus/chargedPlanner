@@ -1,9 +1,17 @@
 import pytest
+
+from freezegun import freeze_time
 from datetime import datetime, timedelta
 
 def test_setup():
 	from chargedPlanner.chargedPlanner import DevGroup
 	DevGroup.reset_instance()  # Clear all instances
+
+@freeze_time("2023-10-01")
+def test_freeze_time():
+
+	# Assert that the result is the mocked date
+	assert datetime.today() == datetime(2023, 10, 1)
 
 def test_calendar_instance():
 
@@ -150,17 +158,18 @@ def test_feat() :
 
 	dev = DevGroup()["Charles"]
 
+	totalEffort = 7
 	remainingEffort = 5
 	purcConnect = 30
 
 	connFeat = Feature(featName="Connectivity",
-						totalEffort=7,
+						totalEffort=totalEffort,
 						remainingEffort=remainingEffort,
 				   		assignee=dev,
 						percentageLoad=purcConnect,
 					   	startDate= datetime(2024, 12, 27).date())
 
-	assert connFeat.getEndDate() == datetime(2025, 1, 17).date()
+	assert connFeat.getEndDate() == datetime(2025, 2, 10).date()
 
 	seedMapFeat = Feature(featName="SeedMap",
 							totalEffort=10,
@@ -168,6 +177,8 @@ def test_feat() :
 				   			assignee=dev,
 							percentageLoad=20,
 	   						startDate=datetime(2024, 12, 27).date())
+
+	assert seedMapFeat.getEndDate() == datetime(2025, 3, 6).date()
 
 	# Try calling the methods with wrong args
 	with pytest.raises(ValueError):
@@ -179,15 +190,20 @@ def test_feat() :
 	with pytest.raises(ValueError):
 		dev.addWorkLoad(seedMapFeat,20)
 
+	assert(dev.getWorkload().getTimeFrame() ==
+		{"startDate": datetime(2024, 12, 27).date(),
+		 "endDate": datetime(2025, 3, 6).date()})
+
 	print(dev.getWorkload())
 
-	assert(dev.getWorkloadFor(datetime(2024, 12, 30).date()) == 0.7)
+	assert dev.getWorkloadFor(datetime(2024, 12, 30).date()) == pytest.approx(0.614285, abs=0.00001)
 
 	print("connectivity end : ", connFeat.getEndDate())
 
 	assert( dev.getEndDateForFeat(connFeat) == connFeat.getEndDate() )
 
-	requireChargedDays = int( remainingEffort * 100 / purcConnect)
+	requireChargedDays = int( totalEffort * 100 / purcConnect * totalEffort / remainingEffort)
+
 	endDate = dev.getCalendar().getDate_after_workDays( \
 		startDate=datetime(2024, 12, 27).date(),
 		requiredWorkDays=requireChargedDays)

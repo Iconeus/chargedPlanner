@@ -304,6 +304,9 @@ class DevGroup(object):
                         "Cannot assign percentageLoad > 100%. Got " + percentageLoad.__str__()
                     )
 
+                # Initially this parameter was only set as % load
+                # After the introduction of the remainingEffort, we choose to not modify the end date of the features
+                # but to modulate the % load as the remainingEffort decreases
                 self.__chargedWorkItems__[feature] = percentageLoad / 100
 
                 self.checkWorkload(feature.getStartDate(), feature.getEndDate())
@@ -353,18 +356,10 @@ class DevGroup(object):
                     )
 
                 requireChargedDays = int(
-                    feature.__remainingEffort__ / self.__chargedWorkItems__[feature]
+                    feature.__totalEffort__ / self.__chargedWorkItems__[feature]
                 )
 
-                # if the startDate is in the future, the shift the end date
-                # otherwise, the work is ongoing. Only matters today and the remaining effort
-                if (
-                    feature.__startDate__ > datetime.now().date()
-                    or is_running_under_pytest()
-                ):
-                    startDate = feature.__startDate__
-                else:
-                    startDate = datetime.now().date()
+                startDate = feature.__startDate__
 
                 return self.__calendar__.getDate_after_workDays(
                     startDate=startDate, requiredWorkDays=requireChargedDays
@@ -458,13 +453,16 @@ class DevGroup(object):
             def __str__(self) -> str:
                 str = "Workload for this dev = \n"
                 str += "--------------------------------------\n"
+                str += "Timeframe = \n"
+                str += self.getTimeFrame().__str__()
+                str += "\n--------------------------------------\n"
                 for feat, purc in self.__chargedWorkItems__.items():
                     str += (
                         feat.__name__
                         + " "
                         + (100 * purc).__str__()
                         + "%, ("
-                        + feat.__startDate__.__str__()
+                        + feat.getStartDate().__str__()
                         + " -> "
                         + feat.getEndDate().__str__()
                         + ")\n"
@@ -839,6 +837,8 @@ class Feature(object):
             raise ValueError("totalEffort is not an int!")
         if not isinstance(remainingEffort, int):
             raise ValueError("remainingEffort is not an int!")
+        if remainingEffort>totalEffort:
+            raise ValueError("remainingEffort cannot be > totalEffort !")
         if not isinstance(startDate, date):
             raise ValueError("startDate is not a date!")
 
@@ -870,6 +870,12 @@ class Feature(object):
             raise ValueError("No assingee assigned to feature : " + self.__name__)
 
         return self.__assignee__.getEndDateForFeat(self)
+
+    def isFinished(self):
+        return self.__remainingEffort__ == 0
+
+    def isLate(self):
+        return not self.isFinished() and self.getEndDate() < datetime.today().date()
 
     # Returns the purcentageload. This is a float in the range 0-1
     def getPurcentageLoad(self) -> float :
@@ -948,9 +954,9 @@ class Feature(object):
             + self.__assignee__.__str__()
             + "\n\tStart date : "
             + self.__startDate__.__str__()
-            + "\n\tTotal effort :"
+            + "\n\tTotal effort : "
             + self.__totalEffort__.__str__()
-            + "\n\tRemaining effort :"
+            + "\n\tRemaining effort : "
             + self.__remainingEffort__.__str__()
         )
         return str
@@ -1045,7 +1051,6 @@ class FixedTimeSpanTrailingFeature(Feature) :
                          percentageLoad=percentageLoad,
                          startDate=startDate)
 
-
 class TestingFeature(FixedTimeSpanTrailingFeature) :
 
     def __init__(
@@ -1083,7 +1088,6 @@ class DebugFeature(FixedTimeSpanTrailingFeature) :
                         percentageLoad = percentageLoad,
                         version = version,
                         assignee = assignee)
-
 
 class DocumentationFeature(FixedTimeSpanTrailingFeature) :
 
@@ -1163,6 +1167,12 @@ class Version(object):
             )
         return ret
 
+    def isFinished(self):
+        return all(iFeat.isFinised() for iFeat in self.__features__)
+
+    def isLate(self):
+        return all(iFeat.isLate() for iFeat in self.__features__)
+
     def gantt(self) -> None:
 
         import plotly.figure_factory as ff
@@ -1171,7 +1181,7 @@ class Version(object):
         for i in self.__features__:
             tasks.append(
                 dict(
-                    Task=i.__name__,
+                    Task=i.__name__ + "_LATE_" if i.isLate() else i.__name__,
                     Start=i.__startDate__.__str__(),
                     Finish=i.getEndDate().__str__(),
                     Assignee=i.__assignee__.__name__,
@@ -1356,6 +1366,9 @@ class Project(object):
                 endDate = tmp
         return endDate
 
+    def isLate(self):
+        return all(iVer.isLate() for iVer in self.__versions__)
+
     def gantt(self) -> None:
 
         import plotly.figure_factory as ff
@@ -1364,7 +1377,7 @@ class Project(object):
         for i in self.__versions__:
             tasks.append(
                 dict(
-                    Task=i.__tag__,
+                    Task= i.__tag__ + "_LATE_"  if i.isLate() else i.__tag__,
                     Start=i.getStartDate().__str__(),
                     Finish=i.getEndDate().__str__(),
                 )
@@ -1450,7 +1463,8 @@ class Project(object):
         return False
 
     def __str__(self) -> None:
-        str = "Project " + self.__product__.name + "\n"
+        str = "=============================\n"
+        str += "Project " + self.__product__.name + "\n"
         for i in self.__versions__:
             str += "\t" + i.__str__()
         return str

@@ -415,7 +415,6 @@ def test_testing_feat() :
 
 	version.gantt()
 
-
 def test_documentation_feat() :
 
 	test_setup()
@@ -493,6 +492,64 @@ def test_documentation_feat() :
 	print(version)
 
 	version.gantt()
+
+def test_documentatio_feat_long() :
+
+	test_setup()
+
+	from chargedPlanner.chargedPlanner import (DevGroup, Feature,
+												   TestingFeature, DocumentationFeature,
+												   IcoStudioVersion)
+
+	charles = DevGroup()["Charles"]
+	selene = DevGroup()["Selene"]
+	thibaud = DevGroup()["Thibaud"]
+	daniele = DevGroup()["Daniele"]
+	sara = DevGroup()["Sara"]
+	hippolyte = DevGroup()["Hippolyte"]
+
+	connFeat = Feature(featName="Connectivity",
+					   totalEffort=30,
+					   remainingEffort=0,
+					   assignee=charles,
+					   percentageLoad=20,
+					   startDate=datetime(2024, 9, 24).date())
+
+	# https://iconeus.tuleap.cloud/plugins/tracker/?aid=1176
+	seedMapFeat = Feature(featName="SeedMap",
+						  totalEffort=30,
+						  remainingEffort=0,
+						  assignee=selene,
+						  percentageLoad=40,
+						  startDate=datetime(2024, 9, 25).date())
+
+	plotSigFeat = Feature(featName="PlotSignal",
+						  totalEffort=20,
+						  remainingEffort=0,
+						  assignee=charles,
+						  percentageLoad=20,
+						  startDate=datetime(2024, 9, 25).date())
+
+	icoStudio230 = IcoStudioVersion("2.3.0")
+	icoStudio230.addFeat(connFeat)
+	icoStudio230.addFeat(seedMapFeat)
+	icoStudio230.addFeat(plotSigFeat)
+
+	testing230 = TestingFeature(
+		version=icoStudio230,
+		assignee=selene,
+		percentageLoad=5,
+		timespan=timedelta(days=15)
+	)
+	icoStudio230.addFeat(testing230)
+
+	documentingSeedMap = DocumentationFeature(
+		version=icoStudio230,
+		assignee=sara,
+		percentageLoad=5,
+		timespan=timedelta(days=7)
+	)
+
 
 def test_project() :
 

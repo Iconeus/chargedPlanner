@@ -1034,6 +1034,10 @@ class FixedTimeSpanTrailingFeature(Feature) :
         # How many workdays since the starting ? +1 to fix boundary conditions
         workDays = assignee.count_workdays(startDate, startDate+timespan)
 
+        if workDays==0 :
+            raise ValueError("Assignee " + assignee.__name__ + " has no working days in the required time span : "
+                             + str(startDate) + " to " + str(startDate+timespan))
+
         totalEffort = 0
         for i in version.__features__ :
             if not isinstance(i,FixedTimeSpanTrailingFeature) :

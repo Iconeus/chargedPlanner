@@ -876,7 +876,7 @@ class Feature(object):
 
     def isLate(self):
         return not self.isFinished() and self.getEndDate() < datetime.today().date()
-
+    
     # Returns the purcentageload. This is a float in the range 0-1
     def getPurcentageLoad(self) -> float :
         return self.__assignee__.getWorkload().__chargedWorkItems__[self]

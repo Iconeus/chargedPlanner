@@ -1,5 +1,4 @@
 from typing import Any
-
 import requests
 from enum import Enum
 import keyring
@@ -12,9 +11,20 @@ class TuleapFeatsFieldsID(Enum) :
     EstimatedDays = 451
     RemainingDays = 452
 
+class TuleapTasksFieldsID(Enum) :
+    Title = 514
+    AssignedTo = 518
+    EstimatedDays = 520
+    RemainingDays = 521
+
+class TuleapItemType(Enum):
+    Versions = "Versions"
+    Features = "Features"
+    Requirements = "Requirements"
+    Bugs = "Bugs"
+    Tasks = "Tasks"
 
 # //////////////////////////////////////////////////////////////////////////////
-
 
 class TuleapIO(object) :
 
@@ -43,6 +53,8 @@ class TuleapIO(object) :
 
         return response
 
+# ===========================================================
+
 ### List the projects :
 class TuleapProjectListIO(TuleapIO) :
 
@@ -62,6 +74,8 @@ class TuleapProjectListIO(TuleapIO) :
 projList = TuleapProjectListIO()
 projList.get(print_response=True)
 
+# ===========================================================
+
 class TuleapProjectIO(TuleapIO) :
 
     def __init__(self, projId : int):
@@ -80,6 +94,8 @@ class TuleapProjectIO(TuleapIO) :
 ### Access project 102 -> icoLab (todo get the id from the projList) :
 proj102 = TuleapProjectIO(projId=102)
 proj102.get(print_response=True)
+
+# ===========================================================
 
 class TuleapProectMilestoneListIO(TuleapIO) :
 
@@ -102,6 +118,8 @@ class TuleapProectMilestoneListIO(TuleapIO) :
 milestoneList = TuleapProectMilestoneListIO(proj102.__id__)
 milestoneList.get(print_response=True)
 
+# ===========================================================
+
 class TuleapArtifactIO(TuleapIO) :
 
     url = f"{TuleapIO.base_url}/artifacts/"
@@ -118,12 +136,14 @@ class TuleapArtifactIO(TuleapIO) :
             artifact = response.json()
             tracker = artifact['tracker']['label']
 
-            if tracker == "Versions" :
+            if tracker == TuleapItemType.Versions.value :
                 return TuleapVersion(response)
-            elif tracker == "Bugs" :
+            elif tracker == TuleapItemType.Bugs.value :
                 return TuleapBug(response)
-            elif tracker == "Features" :
+            elif tracker == TuleapItemType.Features.value :
                 return TuleapFeature(response)
+            elif tracker == TuleapItemType.Tasks.value:
+                return TuleapTask(response)
             else :
                 print("skipping unrecognised item id : ", artifactId )
         else :
@@ -145,32 +165,6 @@ class TuleapArtifactIO(TuleapIO) :
         self.__tuleapId__ =  self.__jSonInfo__['id']
         self.__traker__ = self.__jSonInfo__['tracker']['label']
 
-    def print(self):
-
-        print("==================  Tuleap ARTIFACT info : ================")
-        print(f"ID: {self.__jSonInfo__['id']}, \n"
-              f"Project Label: {self.__jSonInfo__['project']['label']}\n",
-              f"Tracker: {self.__jSonInfo__['tracker']['label']}")
-
-        # print("================== ARTIFACT trackers for milestone : ================")
-        for item in self.__jSonInfo__['values']:
-            if item['type'] == "art_link":
-                links = item['links']
-                for artifact in links:
-                    print("linked artifact id = " + str(artifact['id']))
-        print("==========================================================")
-
-
-class TuleapVersion(TuleapArtifactIO) :
-
-    def __init__(self, response) :
-
-        # cannot call the mother class constructor that raises an exception
-        self.__initialise__(response)
-
-        if not self.__traker__ == "Versions" :
-            raise ValueError("This json is not describing a version !")
-
         self.__linkedArtifacts__ = []
 
         for item in self.__jSonInfo__['values']:
@@ -182,32 +176,50 @@ class TuleapVersion(TuleapArtifactIO) :
 
                     self.__linkedArtifacts__.append( TuleapArtifactIO.factory(id) )
 
-    def print(self) :
+    def print(self, separator: str ="" ):
 
-        print("==================  TuleapVersion print : ================")
-        super().print()
-        print("class type : ", type(self))
-        for i in self.__linkedArtifacts__:
-            i.print()
-        print("==========================================================")
+        print(f"{separator}ID: {self.__jSonInfo__['id']},\n"
+              f"{separator}Title: {self.__jSonInfo__['title']},\n",
+              f"{separator}Project: {self.__jSonInfo__['project']['label']},\n",
+              f"{separator}Tracker: {self.__jSonInfo__['tracker']['label']}")
 
+        for artifact in self.__linkedArtifacts__ :
+            artifact.print(separator+"\t")
 
-class TuleapBug(TuleapArtifactIO) :
+class TuleapVersion(TuleapArtifactIO) :
 
     def __init__(self, response) :
 
         # cannot call the mother class constructor that raises an exception
         self.__initialise__(response)
 
-        if not self.__traker__ == "Bugs" :
-            raise ValueError("This json is not describing a Bug !")
+        if not self.__traker__ == TuleapItemType.Versions.value :
+            raise ValueError("This json is not describing a version !")
 
-    def print(self) :
+    def print(self, separator:str ="") :
 
-        print("==================  TuleapBug print : ================")
-        super().print()
+        print("==================  TuleapVersion : ================")
+        super().print(separator+"\t")
         print("class type : ", type(self))
         print("==========================================================")
+
+class TuleapBug(TuleapArtifactIO) :
+
+    def __init__(self, response) :
+
+        # cannot call the mother class constructor that raises an exception
+        # as TuleapArtifactIO is abstract
+        self.__initialise__(response)
+
+        if not self.__traker__ == TuleapItemType.Bugs.value :
+            raise ValueError("This json is not describing a Bug !")
+
+    def print(self,separator:str ="") :
+
+        print(separator+"==================  Tuleap Bug : ================")
+        super().print(separator)
+        print(separator+"class type : ", type(self))
+        print(separator+"==========================================================")
 
 class TuleapFeature(TuleapArtifactIO) :
 
@@ -216,83 +228,51 @@ class TuleapFeature(TuleapArtifactIO) :
         # cannot call the mother class constructor that raises an exception
         self.__initialise__(response)
 
-        if not self.__traker__ == "Features" :
+        if not self.__traker__ == TuleapItemType.Features.value :
             raise ValueError("This json is not describing a Feature !")
 
-    def print(self):
+    def print(self, separator:str =""):
 
-        print("==================  TuleapFeature print : ================")
-        super().print()
-        print("class type : ", type(self))
-        print("==========================================================")
+        print(separator+"==================  Tuleap Feature : ================")
+        super().print(separator)
+        print(separator+"class type : ", type(self))
+        print(separator+"==========================================================")
 
-### Access icoLab 1.4 milestone as an artifact  :
-# artifact_1_4 = 1109
-# url = f"{base_url}/artifacts/{artifact_1_4}"
-# response = requests.get(url, headers=headers)
-#
-# if response.status_code == 200:
-#     icolab14 = response.json()
-#     print("================== ARTIFACT trackers for milestone Icolab 1.4: ================")
-#     for item  in icolab14['values'] :
-#         if item['type'] == "art_link" :
-#             links= item['links']
-#             for artifact in links :
-#                 print("artifact id = " + str(artifact['id'])  )
-# else:
-#     print(f"Error: {response.status_code}")
-#     print(response.text)
+class TuleapTask(TuleapArtifactIO) :
 
+    def __init__(self, response) :
 
-# Get a handle on IcoLab Version BETA 1.4.0 rCBV - artifact ID 1109
+        # cannot call the mother class constructor that raises an exception
+        self.__initialise__(response)
+
+        if not self.__traker__ == TuleapItemType.Tasks.value :
+            raise ValueError("This json is not describing a Task !")
+
+        for iValue in self.__jSonInfo__['values']:
+            if iValue["field_id"] == TuleapTasksFieldsID.Title.value :
+                self.__title__ = iValue["value"]
+            if iValue["field_id"] == TuleapTasksFieldsID.EstimatedDays.value :
+                self.__estimatedDays__ = iValue["value"]
+            if iValue["field_id"] ==  TuleapTasksFieldsID.RemainingDays.value :
+                self.__remainingDays__ = iValue["value"]
+            if iValue["field_id"] ==  TuleapTasksFieldsID.AssignedTo.value :
+                if not len(iValue["values"]) == 1 :
+                    raise ValueError("Only one assignee allowed !")
+                self.__assigneeID__ = iValue["values"][0]['id']
+                self.__assigneeName__ = iValue["values"][0]['username']
+
+    def print(self, separator:str =""):
+
+        print(separator+"==================  Tuleap Task : ================")
+        super().print(separator)
+        print(separator+"class type : ", type(self))
+        print(separator+"Title : ", self.__title__)
+        print(separator+"Estimated Days : ", self.__estimatedDays__)
+        print(separator+"Remaining Days : ", self.__remainingDays__)
+        print(separator+"Assigned to : ", self.__assigneeName__)
+        print(separator+"==========================================================")
+
+# Get a handle on an artifact ID 1109
+# Artifact 1109 corresponds to IcoLab Version : BETA 1.4.0 rCBV
 artifact_1_4 = TuleapArtifactIO.factory(1109)
 artifact_1_4.print()
-
-
-# ## Access one artifact
-#
-# artifactID = 1129
-# url = f"{base_url}/artifacts/{artifactID}"
-# response = requests.get(url, headers=headers)
-#
-# if response.status_code == 200:
-#     artifact = response.json()
-#     print("================== Artifact "+ str(artifactID) +" ================")
-#     # improve diagnostics on scan reading missing fields
-#     if artifact['tracker']['label'] == "Bug" :
-#         print(f"artifact :"
-#               f"\n\t\id= {artifact['id']},"
-#               f"\n\ttitle : {artifact['title']}"
-#               f"\n\ttype : {artifact['tracker']['label']}"
-#               f"\n\tassignee : {artifact['assignees'][0]['username']}"
-#               )
-#
-#         for iField in artifact['values'] :
-#             if int(iField['field_id']) == TuleapBugsFieldsID.EstimatedDays.value :
-#                 print(f"Estimated days = {iField['value']}")
-#             if int(iField['field_id']) == TuleapBugsFieldsID.RemainingDays.value :
-#                 print(f"Remaining days = {iField['value']}")
-#
-#     elif artifact['tracker']['label'] == "Features" :
-#
-#         print(f"artifact :"
-#               f"\n\tid= {artifact['id']},"
-#               f"\n\ttitle : {artifact['title']}"
-#               f"\n\ttype : {artifact['tracker']['label']}"
-#               )
-#
-#         for iField in artifact['values']:
-#             if int(iField['field_id']) == TuleapFeatsFieldsID.EstimatedDays.value:
-#                 print(f"Estimated days = {iField['value']}")
-#             if int(iField['field_id']) == TuleapFeatsFieldsID.RemainingDays.value:
-#                 print(f"Remaining days = {iField['value']}")
-#     else :
-#
-#         print(f"artifact type non recognised :"
-#               f"\n\ttype= {artifact['tracker']['label']}"
-#               )
-#
-# else:
-#     print(f"Error: {response.status_code}")
-#     print(response.text)
-

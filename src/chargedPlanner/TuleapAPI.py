@@ -3,11 +3,20 @@ import requests
 from enum import Enum
 import keyring
 
+class TuleapVersionsFieldsID(Enum) :
+    Title = -100
+    EstimatedDays = 436
+    RemainingDays = 437
+
 class TuleapBugsFieldsID(Enum) :
+    Title = 417
     EstimatedDays = 436
     RemainingDays = 437
 
 class TuleapFeatsFieldsID(Enum) :
+    Title = 445
+    # Feats are not assigned to an assignee !
+    # AssignedTo = -100
     EstimatedDays = 451
     RemainingDays = 452
 
@@ -152,15 +161,20 @@ class TuleapArtifactIO(TuleapIO) :
 
     def __init__(self, artifactId : int ):
 
+        self.__title__ = None
+        self.__estimatedDays__ = None
+        self.__remainingdDays__ = None
+
         raise TypeError("TuleapArtifactIO is an abstract class and cannot be instantiated directly.")
 
-        # super().__init__()
-        # self.__url__ = f"{TuleapIO.base_url}/artifacts/{artifactId}"
-        # self.__Id__ = artifactId
 
     def __initialise__(self, response) -> Any :
 
         self.__jSonInfo__ = response.json()
+
+        self.__title__ = None
+        self.__estimatedDays__ = None
+        self.__remainingDays__ = None
 
         self.__tuleapId__ =  self.__jSonInfo__['id']
         self.__traker__ = self.__jSonInfo__['tracker']['label']
@@ -176,12 +190,28 @@ class TuleapArtifactIO(TuleapIO) :
 
                     self.__linkedArtifacts__.append( TuleapArtifactIO.factory(id) )
 
+    def getEstimatedDays(self) -> int :
+        if self.__estimatedDays__ is None:
+            print("Warning : Effort for " + self.__class__.__name__ + " = " +  str(self.__tuleapId__) + " not estimated")
+
+        return self.__estimatedDays__
+
+    def getRemainingDays(self) -> int:
+
+        if self.__remainingDays__ is None:
+            print("Warning : Remaining effort for " + self.__class__.__name__ + " = " +  str(self.__tuleapId__) + " not estimated")
+
+        return self.__remainingDays__
+
+    #         childrenReminingDaysSum += artifact.getRemainingDays()
     def print(self, separator: str ="" ):
 
         print(f"{separator}ID: {self.__jSonInfo__['id']},\n"
               f"{separator}Title: {self.__jSonInfo__['title']},\n",
               f"{separator}Project: {self.__jSonInfo__['project']['label']},\n",
-              f"{separator}Tracker: {self.__jSonInfo__['tracker']['label']}")
+              f"{separator}Tracker: {self.__jSonInfo__['tracker']['label']},\n",
+              f"{separator}Estimated days: {self.getEstimatedDays()},\n",
+              f"{separator}Remaining days: {self.getRemainingDays()}")
 
         for artifact in self.__linkedArtifacts__ :
             artifact.print(separator+"\t")
@@ -195,6 +225,14 @@ class TuleapVersion(TuleapArtifactIO) :
 
         if not self.__traker__ == TuleapItemType.Versions.value :
             raise ValueError("This json is not describing a version !")
+
+        for iValue in self.__jSonInfo__['values']:
+            if iValue["field_id"] == TuleapVersionsFieldsID.Title.value :
+                self.__title__ = iValue["value"]
+            if iValue["field_id"] == TuleapVersionsFieldsID.EstimatedDays.value :
+                self.__estimatedDays__ = iValue["value"]
+            if iValue["field_id"] ==  TuleapVersionsFieldsID.RemainingDays.value :
+                self.__remainingDays__ = iValue["value"]
 
     def print(self, separator:str ="") :
 
@@ -214,6 +252,14 @@ class TuleapBug(TuleapArtifactIO) :
         if not self.__traker__ == TuleapItemType.Bugs.value :
             raise ValueError("This json is not describing a Bug !")
 
+        for iValue in self.__jSonInfo__['values']:
+            if iValue["field_id"] == TuleapBugsFieldsID.Title.value :
+                self.__title__ = iValue["value"]
+            if iValue["field_id"] == TuleapBugsFieldsID.EstimatedDays.value :
+                self.__estimatedDays__ = iValue["value"]
+            if iValue["field_id"] ==  TuleapBugsFieldsID.RemainingDays.value :
+                self.__remainingDays__ = iValue["value"]
+
     def print(self,separator:str ="") :
 
         print(separator+"==================  Tuleap Bug : ================")
@@ -230,6 +276,29 @@ class TuleapFeature(TuleapArtifactIO) :
 
         if not self.__traker__ == TuleapItemType.Features.value :
             raise ValueError("This json is not describing a Feature !")
+
+        for iValue in self.__jSonInfo__['values']:
+            if iValue["field_id"] == TuleapFeatsFieldsID.Title.value :
+                self.__title__ = iValue["value"]
+            if iValue["field_id"] == TuleapFeatsFieldsID.EstimatedDays.value :
+                self.__estimatedDays__ = iValue["value"]
+            if iValue["field_id"] ==  TuleapFeatsFieldsID.RemainingDays.value :
+                self.__remainingDays__ = iValue["value"]
+
+        def checkEstimatedDays() -> None:
+
+            childrenEstimatedDaysSum = 0
+            childrenReminingDaysSum = 0
+            for artifact in self.__linkedArtifacts__:
+                childrenEstimatedDaysSum += artifact.getEstimatedDays()
+                childrenReminingDaysSum += artifact.getRemainingDays()
+
+            if  childrenEstimatedDaysSum != self.__estimatedDays__ :
+                raise ValueError("The estimated days for this feature does not correspond to the sum of its children")
+            if  childrenReminingDaysSum != self.__remainingDays__ :
+                raise ValueError("The remaining days for this feature does not correspond to the sum of its children")
+
+        checkEstimatedDays()
 
     def print(self, separator:str =""):
 

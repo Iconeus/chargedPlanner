@@ -4,7 +4,7 @@ freezegun==1.5.1
 holidays==0.71
 keyring==25.6.0
 numpy==2.2.4
-pandas==2.2.3
+pandas==2.3.2
 plotly==6.0.1
 pytest==8.3.5
 ratelimit==2.2.1

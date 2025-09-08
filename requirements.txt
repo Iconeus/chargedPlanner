@@ -1,7 +1,7 @@
 colorama==0.4.6
 flake8==7.2.0
 freezegun==1.5.1
-holidays==0.71
+holidays==0.80
 keyring==25.6.0
 numpy==2.2.4
 pandas==2.2.3

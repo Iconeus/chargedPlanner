@@ -14,17 +14,17 @@ class TuleapBugsFieldsID(Enum) :
     RemainingDays = 437
 
 class TuleapFeatsFieldsID(Enum) :
-    Title = 445
+    Title = 916
     # Feats are not assigned to an assignee !
     # AssignedTo = -100
-    EstimatedDays = 451
-    RemainingDays = 452
+    EstimatedDays = 922
+    RemainingDays = 923
 
 class TuleapTasksFieldsID(Enum) :
-    Title = 514
-    AssignedTo = 518
-    EstimatedDays = 520
-    RemainingDays = 521
+    Title = 985
+    AssignedTo = 989
+    EstimatedDays = 991
+    RemainingDays = 992
 
 class TuleapTechnicalsFieldsID(Enum) :
     Title = 1003
@@ -346,8 +346,14 @@ class TuleapFeature(TuleapTimedItem) :
             childrenReminingDaysSum = 0
             for artifact in self.__linkedArtifacts__:
 
-                childrenEstimatedDaysSum += artifact.getEstimatedDays()
-                childrenReminingDaysSum += artifact.getRemainingDays()
+                try:
+                    childrenEstimatedDaysSum += artifact.getEstimatedDays()
+                    childrenReminingDaysSum += artifact.getRemainingDays()
+                # this happens if artifact does not contain methods getEstimatedDays, getRemainingDays
+                except AttributeError :
+                    pass
+                finally:
+                    pass
 
             if  childrenEstimatedDaysSum != self.__estimatedDays__ :
                 raise ValueError("The estimated days for this feature does not correspond to the sum of its children")

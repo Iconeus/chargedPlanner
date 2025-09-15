@@ -545,7 +545,7 @@ class DevGroup(object):
         def luccaConnector(self, luccaID : int) -> None :
 
             startDate = datetime.today().date()
-            endDate = startDate + timedelta(days=120)
+            endDate = startDate + timedelta(days=240)
 
             from chargedPlanner.LuccaAPI import LuccaAPI
             for i in LuccaAPI().getLeaves(luccaID,startDate,endDate) :

@@ -169,7 +169,7 @@ def test_feat() :
 						percentageLoad=purcConnect,
 					   	startDate= datetime(2024, 12, 27).date())
 
-	assert connFeat.getEndDate() == datetime(2025, 1, 28).date()
+	assert connFeat.getEndDate() == datetime(2025, 1, 17).date()
 
 	seedMapFeat = Feature(featName="SeedMap",
 							totalEffort=10,
@@ -202,7 +202,7 @@ def test_feat() :
 
 	assert( dev.getEndDateForFeat(connFeat) == connFeat.getEndDate() )
 
-	requireChargedDays = int( totalEffort * 100 / purcConnect )
+	requireChargedDays = int( remainingEffort * 100 / purcConnect )
 
 	endDate = dev.getCalendar().getDate_after_workDays( \
 		startDate=datetime(2024, 12, 27).date(),
@@ -333,7 +333,7 @@ def test_version() :
 	selene.gantt()
 	version.gantt()
 
-	assert(version.getEndDate() == datetime(2025, 2, 18).date())
+	assert(version.getEndDate() == datetime(2025, 2, 12).date())
 
 	from chargedPlanner.chargedPlanner import IcoScanVersion, IcoLabVersion
 	version = IcoLabVersion("1.0.0")
@@ -393,8 +393,8 @@ def test_testing_feat() :
 	# certainly not ideal, the issue is that the timeframes are computed via ceils, that
 	# round up the actual values. Not a big deal though...
 	assert( testingSJ.getEndDate() - testingSJ.getStartDate() == timedelta(days=14) )
-	assert( testingSJ.getStartDate() == datetime(2025, 2, 28).date() )
-	assert( testingSJ.getEndDate() == datetime(2025, 3, 14).date() )
+	assert( testingSJ.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testingSJ.getEndDate() == datetime(2025, 3, 5).date() )
 
 	version.addFeat(testingSJ)
 	assert( testingSJ.getEndDate() == version.getEndDate() )
@@ -440,7 +440,7 @@ def test_documentation_feat() :
 	# (remainingEffort = 5), the workload % is decreased to 10%
 	assert charles.getWorkload().__chargedWorkItems__[connFeat] == .2
 
-	assert connFeat.getEndDate() ==  datetime(2025, 3, 6).date()
+	assert connFeat.getEndDate() ==  datetime(2025, 1, 30).date()
 
 	seedMapFeat = Feature(featName="SeedMap",
 						  assignee=selene,
@@ -467,8 +467,8 @@ def test_documentation_feat() :
 		timespan=timedelta(days=15)
 	)
 
-	assert( testing.getStartDate() == datetime(2025, 3, 6).date() )
-	assert( testing.getEndDate() == datetime(2025, 3, 20).date() )
+	assert( testing.getStartDate() == datetime(2025, 2, 19).date() )
+	assert( testing.getEndDate() == datetime(2025, 3, 5).date() )
 
 	version.addFeat(testing)
 
@@ -481,8 +481,8 @@ def test_documentation_feat() :
 		timespan=timedelta(days=15)
 	)
 
-	assert (documentation.getStartDate() == datetime(2025, 3, 20).date())
-	assert (documentation.getEndDate() == datetime(2025, 4, 3).date())
+	assert (documentation.getStartDate() == datetime(2025, 3, 5).date())
+	assert (documentation.getEndDate() == datetime(2025, 3, 19).date())
 
 	version.addFeat(documentation)
 
@@ -712,13 +712,13 @@ def test_unSerialise_project() :
 	assert isinstance(version, IcoStudioVersion)
 
 	assert datetime(2024, 11, 15).date() == version.getStartDate(), "Version Start date mismatch"
-	assert datetime(2025, 4, 7).date() == version.getEndDate(), "Version End date mismatch"
+	assert datetime(2025, 3, 3).date() == version.getEndDate(), "Version End date mismatch"
 
 	with pytest.raises(ValueError):
 		version.getFeature("nonExistingFeature")
 
 	connFeat = version.getFeature("Connectivity")
 
-	assert datetime(2025, 2, 6).date() == connFeat.getEndDate()
+	assert datetime(2025, 1, 30).date() == connFeat.getEndDate()
 
 	charles.gantt()

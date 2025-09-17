@@ -356,7 +356,7 @@ class DevGroup(object):
                     )
 
                 requireChargedDays = int(
-                    feature.__totalEffort__ / self.__chargedWorkItems__[feature]
+                    feature.__remainingEffort__ / self.__chargedWorkItems__[feature]
                 )
 
                 startDate = feature.__startDate__

@@ -1191,8 +1191,20 @@ class Version(object):
         if not len(tasks):
             return
 
+        def generate_colors(n):
+            import random
+            import colorsys
+
+            hues = [i / float(n) for i in range(n)]
+            colors = []
+            for h in hues:
+                rgb = colorsys.hsv_to_rgb(h, 1.0, 1.0)
+                colors.append(f'rgb({int(rgb[0] * 255)},{int(rgb[1] * 255)},{int(rgb[2] * 255)})')
+            return colors
+
         fig = ff.create_gantt(
-            tasks,
+            df=tasks,
+            colors=generate_colors(len(tasks)),
             group_tasks=True,
             index_col="Task",
             title="Gantt chart for "

@@ -359,7 +359,7 @@ class DevGroup(object):
                     feature.__remainingEffort__ / self.__chargedWorkItems__[feature]
                 )
 
-            def getEndDateForFeat(self, feature: Feature) -> date:
+            def getEndDateForFeat_initialGuess(self, feature: Feature) -> date:
 
                 requireChargedDays = self.getRemainingEffortForFeat(feature)
 
@@ -368,6 +368,23 @@ class DevGroup(object):
                 return self.__calendar__.getDate_after_workDays(
                     startDate=startDate, requiredWorkDays=requireChargedDays
                 )
+
+
+            def getEndDateForFeat(self, feature: Feature) -> date:
+
+                if feature.isLate() :
+
+                    requireChargedDays = self.getRemainingEffortForFeat(feature)
+
+                    startDate = datetime.today().date()
+
+                    return self.__calendar__.getDate_after_workDays(
+                        startDate=startDate, requiredWorkDays=requireChargedDays
+                    )
+
+                else :
+                    return self.getEndDateForFeat_initialGuess(feature)
+
 
             def getStartDateForFirstAssignedFeat(self, filter = defaultFilter) -> date :
 
@@ -537,6 +554,13 @@ class DevGroup(object):
 
         def getRemainingEffortForFeat(self, feature: Feature) -> int:
             return self.getWorkload().getRemainingEffortForFeat(feature)
+
+        """ returns the initial guesss for the date of end for a specific feature assigned to this dev
+            if the feature is not late, this is equal to the end date
+        """
+
+        def getEndDateForFeat_initialGuess(self, feature: Feature) -> date:
+            return self.getWorkload().getEndDateForFeat_initialGuess(feature)
 
         """ returns the date of end for a specific feature assigned to this dev"""
 
@@ -875,6 +899,13 @@ class Feature(object):
 
         return self.__startDate__
 
+    def getEndDate_initialGuess(self) -> date:
+
+        if self.__assignee__ is None:
+            raise ValueError("No assingee assigned to feature : " + self.__name__)
+
+        return self.__assignee__.getEndDateForFeat_initialGuess(self)
+
     def getEndDate(self) -> date:
 
         if self.__assignee__ is None:
@@ -1190,21 +1221,25 @@ class Version(object):
 
         tasks = []
         for i in self.__features__:
-            tasks.append(
-                dict(
-                    Task=i.__name__ + "_LATE_" if i.isLate() else i.__name__,
-                    Start=i.__startDate__.__str__(),
-                    Finish=i.getEndDate().__str__(),
-                    Assignee=i.__assignee__.__name__,
-                )
-            )
 
-            if i.isLate() :
+            isLate = i.isLate()
+
+            if isLate :
+
                 tasks.append(
                     dict(
-                        Task=i.__name__ + "_LATE_",
+                        Task=i.__name__ + "_LATE_" ,
+                        Start=i.__startDate__.__str__(),
+                        Finish=i.getEndDate_initialGuess().__str__(),
+                        Assignee=i.__assignee__.__name__,
+                    )
+                )
+
+            tasks.append(
+                    dict(
+                        Task=i.__name__ + "_LATE_" if isLate else i.__name__,
                         Start=datetime.today().date().__str__(),
-                        Finish=( datetime.today().date() + timedelta(days=i.__assignee__.getRemainingEffortForFeat(i))).__str__(),
+                        Finish=i.getEndDate().__str__(),
                         Assignee=i.__assignee__.__name__,
                     )
                 )

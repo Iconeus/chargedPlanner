@@ -45,8 +45,8 @@ icoStudio240.addFeat(
 			totalEffort=6,
 			remainingEffort=6,
 			assignee=luc,
-			percentageLoad=80,
-			startDate=datetime(2024, 9, 20).date())
+			percentageLoad=20,
+			startDate=datetime(2025, 9, 1).date())
 )
 
 # https://iconeus.tuleap.cloud/plugins/tracker/?aid=1260

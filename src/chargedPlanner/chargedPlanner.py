@@ -345,7 +345,7 @@ class DevGroup(object):
                     if purc > 1:
                         print("Workload " + iDay.__str__() + " = " + str(purc))
 
-            def getEndDateForFeat(self, feature: Feature) -> date:
+            def getRemainingEffortForFeat(self, feature: Feature) -> int:
 
                 if not isinstance(feature, Feature):
                     raise ValueError("incompatible Feature type")
@@ -355,9 +355,13 @@ class DevGroup(object):
                         "Feature " + feature.__name__ + " is not assigned to this dev"
                     )
 
-                requireChargedDays = int(
+                return int(
                     feature.__remainingEffort__ / self.__chargedWorkItems__[feature]
                 )
+
+            def getEndDateForFeat(self, feature: Feature) -> date:
+
+                requireChargedDays = self.getRemainingEffortForFeat(feature)
 
                 startDate = feature.__startDate__
 
@@ -526,6 +530,13 @@ class DevGroup(object):
 
         def getStartDateForFirstAssignedFeat(self) -> date :
             return self.getWorkload().getStartDateForFirstAssignedFeat()
+
+        """ returns the effort (in days : int) for finalising a specific feature assigned to this dev
+            the estimate takes into account the effort accorded to this taks 
+        """
+
+        def getRemainingEffortForFeat(self, feature: Feature) -> int:
+            return self.getWorkload().getRemainingEffortForFeat(feature)
 
         """ returns the date of end for a specific feature assigned to this dev"""
 
@@ -1187,6 +1198,16 @@ class Version(object):
                     Assignee=i.__assignee__.__name__,
                 )
             )
+
+            if i.isLate() :
+                tasks.append(
+                    dict(
+                        Task=i.__name__ + "_LATE_",
+                        Start=datetime.today().date().__str__(),
+                        Finish=( datetime.today().date() + timedelta(days=i.__assignee__.getRemainingEffortForFeat(i))).__str__(),
+                        Assignee=i.__assignee__.__name__,
+                    )
+                )
 
         if not len(tasks):
             return

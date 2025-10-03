@@ -1445,14 +1445,21 @@ class Project(object):
         return project_instance
 
     def serialise(self) -> None:
-        with open("Project.json", "w") as json_file:
+        with open("{projectName}_{today}.json".format(
+                projectName = str(self.__product__.name),
+                today = datetime.today().strftime("%Y%m%d")
+        ), "w") as json_file:
             outDict = self.to_dict()
             json.dump(outDict, json_file, indent=4)
 
     @classmethod
-    def unserialise(cls) -> Project:
+    def unserialise(cls, jSonFile : str) -> Project:
 
-        with open("project.json", "r") as json_file:
+        import os
+        if not os.path.isfile(jSonFile) :
+            raise ValueError("File : {jSon} not found\n".format(jSon=jSonFile))
+
+        with open(jSonFile, "r") as json_file :
             project_dict = json.load(json_file)
             return cls.from_dict(project_dict)
 

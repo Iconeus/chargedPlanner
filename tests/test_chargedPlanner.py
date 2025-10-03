@@ -672,7 +672,11 @@ def test_serialise_project() :
 	# it can be reloaded
 	icoStudioProject.__dereference__()
 
-	icoStudioProject_Reloaded = Project.unserialise()
+	fileName = "{projectName}_{today}.json".format(
+                projectName = str(IconeusProduct.IcoStudio.name),
+                today = datetime.today().strftime("%Y%m%d")
+        )
+	icoStudioProject_Reloaded = Project.unserialise(fileName)
 
 	print(icoStudioProject_Reloaded)
 
@@ -687,27 +691,21 @@ def test_serialise_project() :
 	# features attached to devs in the icoStudioProject
 	assert( icoStudioProject == icoStudioProject_Reloaded )
 
-def test_unSerialise_project() :
+	assert IconeusProduct.IcoStudio == icoStudioProject.__product__
 
-	test_setup()
-
-	from chargedPlanner.chargedPlanner import DevGroup, Project, IconeusProduct, IcoStudioVersion
-
-	project = Project.unserialise()
-
-	assert  IconeusProduct.IcoStudio == project.__product__
-
-	project.gantt()
+	icoStudioProject_Reloaded.gantt()
 
 	charles = DevGroup()['Charles']
 
 	assert isinstance(charles, DevGroup.Dev)
 	assert not isinstance(charles, DevGroup.Manager)
 
-	assert 0.4 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
-	assert 0.8 == pytest.approx(charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
+	assert 0.4 == pytest.approx(
+		charles.getWorkload().getWorkloadFor(datetime(2024, 12, 30).date())), "Floats do not match within tolerance"
+	assert 0.8 == pytest.approx(
+		charles.getWorkload().getWorkloadFor(datetime(2025, 1, 10).date())), "Floats do not match within tolerance"
 
-	version = project.getVersion("1.0.0")
+	version = icoStudioProject_Reloaded.getVersion("1.0.0")
 
 	assert isinstance(version, IcoStudioVersion)
 

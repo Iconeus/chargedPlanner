@@ -725,11 +725,32 @@ class DevGroup(object):
             }
 
         @classmethod
-        def from_dict(cls, data):
+        def from_dict(cls, data) :
 
             ret = cls(data["DevName"])
             ret.__workload__ = cls.WorkLoad.from_dict(data["Workload"])
             return ret
+
+        def serialise(self) -> None:
+
+            with open("{devName}_{today}.json".format(
+                devName=str(self.__name__),
+                today=datetime.today().strftime("%Y%m%d")
+            ), "w") as json_file:
+
+                outDict = self.to_dict()
+                json.dump(outDict, json_file, indent=4)
+
+        @classmethod
+        def unserialise(cls, jSonFile: str) -> DevBase :
+
+            import os
+            if not os.path.isfile(jSonFile):
+                raise ValueError("File : {jSon} not found\n".format(jSon=jSonFile))
+
+            with open(jSonFile, "r") as json_file:
+                project_dict = json.load(json_file)
+                return cls.from_dict(project_dict)
 
         def getIdentifier(self):
             return self.__name__

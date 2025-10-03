@@ -619,6 +619,47 @@ def test_project() :
 	selene.gantt()
 	selene.loadChart()
 
+def test_serialise_dev() :
+
+	from chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
+
+	charles = DevGroup()['Charles']
+	selene = DevGroup()['Selene']
+
+	connFeat = Feature(featName="Connectivity",
+					   totalEffort=6,
+					   remainingEffort=5,
+					   assignee=charles,
+					   percentageLoad = 20,
+					   startDate=datetime(2024, 12, 26).date())
+
+	seedMapFeat = Feature(featName="SeedMap",
+						  totalEffort=20,
+						  remainingEffort=15,
+						  assignee=selene,
+						  percentageLoad=20,
+						  startDate=datetime(2024, 11, 15).date())
+
+	charles.serialise()
+	selene.serialise()
+
+	assert charles != selene
+
+	charlesFileName = "{devName}_{today}.json".format(
+                devName=str(charles.__name__),
+                today=datetime.today().strftime("%Y%m%d"))
+	charles_reloaded = DevGroup.Dev.unserialise(charlesFileName)
+
+	assert charles == charles_reloaded
+
+	seleneFileName = "{devName}_{today}.json".format(
+		devName=str(selene.__name__),
+		today=datetime.today().strftime("%Y%m%d"))
+	selene_reloaded = DevGroup.Dev.unserialise(seleneFileName)
+
+	assert selene == selene_reloaded
+
+
 def test_serialise_project() :
 
 	test_setup()

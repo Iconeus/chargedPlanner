@@ -5,7 +5,7 @@ holidays==0.71
 keyring==25.6.0
 numpy==2.2.4
 pandas==2.2.3
-plotly==6.0.1
+plotly==6.3.1
 pytest==8.3.5
 ratelimit==2.2.1
 requests==2.32.3

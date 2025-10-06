@@ -621,7 +621,9 @@ def test_project() :
 
 def test_serialise_dev() :
 
-	from chargedPlanner.chargedPlanner import DevGroup, Feature, IcoStudioVersion, Project, IconeusProduct
+	test_setup()
+
+	from chargedPlanner.chargedPlanner import DevGroup, Feature
 
 	charles = DevGroup()['Charles']
 	selene = DevGroup()['Selene']
